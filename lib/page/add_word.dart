@@ -2,6 +2,11 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:fsrs/fsrs.dart' as fsrs;
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart' as uuid;
+import 'package:worder/entity/word_model.dart';
+import 'package:worder/service.dart';
 
 @RoutePage()
 class AddWordPage extends StatefulWidget {
@@ -12,10 +17,14 @@ class AddWordPage extends StatefulWidget {
 }
 
 class _AddWordPageState extends State<AddWordPage> {
+  static const _saveErrorMessage = 'Failed to save the word';
+  static const _savedMessage = 'Saved';
+
   late final TextEditingController _wordCtrl;
   late final TextEditingController _pinyinCtrl;
   late final TextEditingController _meaningCtrl;
   late final TextEditingController _noteCtrl;
+  late final FocusNode _wordFocus;
   late final ValueNotifier<bool> _canConfirm;
 
   @override
@@ -25,6 +34,7 @@ class _AddWordPageState extends State<AddWordPage> {
     _pinyinCtrl = TextEditingController();
     _meaningCtrl = TextEditingController();
     _noteCtrl = TextEditingController();
+    _wordFocus = FocusNode();
     _canConfirm = ValueNotifier(false);
     _wordCtrl.addListener(_updateButtons);
     _pinyinCtrl.addListener(_updateButtons);
@@ -37,6 +47,7 @@ class _AddWordPageState extends State<AddWordPage> {
     _pinyinCtrl.dispose();
     _meaningCtrl.dispose();
     _noteCtrl.dispose();
+    _wordFocus.dispose();
     _canConfirm.dispose();
     super.dispose();
   }
@@ -55,6 +66,7 @@ class _AddWordPageState extends State<AddWordPage> {
   }
 
   Future<void> _onConfirm() async {
+    final dbService = context.read<WorderStorageService>();
     final result = await showOkCancelAlertDialog(
       context: context,
       title: 'Save this word?',
@@ -63,14 +75,32 @@ class _AddWordPageState extends State<AddWordPage> {
       cancelLabel: 'Cancel',
     );
     if (result != OkCancelResult.ok) return;
-    BotToast.showText(
-      text:
-          'Word: ${_wordCtrl.text.trim()}\n'
-          'Pinyin: ${_pinyinCtrl.text.trim()}\n'
-          'Meaning: ${_meaningCtrl.text.trim()}\n'
-          'Note: ${_noteCtrl.text.trim()}',
-      duration: const Duration(seconds: 4),
+    final wordText = _wordCtrl.text.trim();
+    final pinyinText = _pinyinCtrl.text.trim();
+    final meaningText = _meaningCtrl.text.trim();
+    final noteText = _noteCtrl.text.trim();
+    final word = WordModel(
+      id: uuid.Uuid().v4(),
+      word: wordText,
+      pinyin: pinyinText,
+      meaning: meaningText,
+      notes: noteText.isEmpty ? const <String>[] : [noteText],
+      fsrsCard: await fsrs.Card.create(),
     );
+    try {
+      await dbService.saveWord(word);
+    } catch (_) {
+      if (!mounted) return;
+      BotToast.showText(text: _saveErrorMessage);
+      return;
+    }
+    if (!mounted) return;
+    _wordCtrl.clear();
+    _pinyinCtrl.clear();
+    _meaningCtrl.clear();
+    _noteCtrl.clear();
+    _wordFocus.requestFocus();
+    BotToast.showText(text: _savedMessage);
   }
 
   @override
@@ -82,6 +112,7 @@ class _AddWordPageState extends State<AddWordPage> {
         children: [
           TextField(
             controller: _wordCtrl,
+            focusNode: _wordFocus,
             autofocus: true,
             textInputAction: TextInputAction.next,
             decoration: const InputDecoration(

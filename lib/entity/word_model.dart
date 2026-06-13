@@ -46,6 +46,7 @@ class WordModel {
       'meaning': meaning,
       // 提取由于 FSRS 筛选必备的到期时间戳
       'due_timestamp': fsrsCard.due.millisecondsSinceEpoch,
+      'last_review_timestamp': fsrsCard.lastReview?.millisecondsSinceEpoch,
       'notes_json': jsonEncode(notes),
       'fsrs_card_json': jsonEncode(_serializeCard(fsrsCard)),
     };
