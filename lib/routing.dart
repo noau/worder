@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:worder/page/add_word.dart';
 import 'package:worder/page/dashboard_page.dart';
 import 'package:worder/page/home.dart';
 import 'package:worder/page/library_page.dart';
@@ -24,5 +25,6 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: SettingsRoute.page, path: 'settings'),
       ],
     ),
+    AutoRoute(page: AddWordRoute.page, path: '/add-word'),
   ];
 }

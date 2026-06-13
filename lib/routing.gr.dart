@@ -11,6 +11,22 @@
 part of 'routing.dart';
 
 /// generated route for
+/// [AddWordPage]
+class AddWordRoute extends PageRouteInfo<void> {
+  const AddWordRoute({List<PageRouteInfo>? children})
+    : super(AddWordRoute.name, initialChildren: children);
+
+  static const String name = 'AddWordRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AddWordPage();
+    },
+  );
+}
+
+/// generated route for
 /// [DashboardPage]
 class DashboardRoute extends PageRouteInfo<void> {
   const DashboardRoute({List<PageRouteInfo>? children})

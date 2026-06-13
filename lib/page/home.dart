@@ -11,10 +11,14 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return AutoTabsScaffold(
       routes: const [DashboardRoute(), LibraryRoute(), SettingsRoute()],
-      appBarBuilder: (_, tabsRouter) => AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Worder'),
-      ),
+      floatingActionButtonBuilder: (context, tabsRouter) =>
+          !tabsRouter.currentPath.endsWith("settings")
+          ? FloatingActionButton(
+              onPressed: () => context.pushRoute(AddWordRoute()),
+              tooltip: "New Word",
+              child: Icon(Icons.add),
+            )
+          : null,
       bottomNavigationBuilder: (_, tabsRouter) {
         return NavigationBar(
           selectedIndex: tabsRouter.activeIndex,
