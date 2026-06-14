@@ -80,19 +80,16 @@ class _DashboardPageState extends State<DashboardPage> {
     if (dueCount > 0) {
       final result = await showOkCancelAlertDialog(
         context: context,
+        barrierDismissible: false,
         title: 'Review work waiting',
-        message: '$dueCount word${dueCount == 1 ? '' : 's'} '
+        message:
+            '$dueCount word${dueCount == 1 ? '' : 's'} '
             '${dueCount == 1 ? 'is' : 'are'} due for review. '
             'Review them first, or continue with learning?',
         okLabel: 'Review',
         cancelLabel: 'Continue learning',
       );
-      if (!mounted) return;
-      if (result == OkCancelResult.ok) {
-        await _openReview();
-        return;
-      }
-      // cancel / dismissed → fall through to the learn batch below.
+      if (!mounted || result == OkCancelResult.ok) return;
     }
 
     final prefs = context.read<PreferencesRepository>();
@@ -109,7 +106,8 @@ class _DashboardPageState extends State<DashboardPage> {
       await showOkAlertDialog(
         context: context,
         title: 'No new words yet',
-        message: 'You have no new words to learn right now. Try to add some new words!',
+        message:
+            'You have no new words to learn right now. Try to add some new words!',
       );
       return;
     }
@@ -136,7 +134,8 @@ class _DashboardPageState extends State<DashboardPage> {
       await showOkAlertDialog(
         context: context,
         title: 'All caught up!',
-        message: 'You have no words due for review right now. Try to learn some new words!',
+        message:
+            'You have no words due for review right now. Try to learn some new words!',
       );
       return;
     }

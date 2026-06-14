@@ -84,7 +84,11 @@ class LearningSessionManager {
     // unorderedElements iterates over all elements; no order guarantee but
     // we need to check each anyway.
     return _queue.unorderedElements
-        .where((w) => !w.fsrsCard.due.isAfter(now))
+        .where(
+          (w) =>
+              !w.fsrsCard.due.isAfter(now) ||
+              w.fsrsCard.state == fsrs.State.learning,
+        )
         .length;
   }
 
@@ -95,7 +99,18 @@ class LearningSessionManager {
   /// null return, the queue is unchanged.
   WordModel? nextWord() {
     if (_queue.isEmpty) return null;
-    if (_queue.first.fsrsCard.due.isAfter(DateTime.now())) return null;
+    if (_queue.first.fsrsCard.due.isAfter(DateTime.now())) {
+      // If there's no word meets due, but still word at learning state,
+      // return the earliest learning word.
+      final firstLearning = _queue.unorderedElements.firstWhereOrNull(
+        (w) => w.fsrsCard.state == fsrs.State.learning,
+      );
+      if (firstLearning != null) {
+        _queue.remove(firstLearning);
+        return firstLearning;
+      }
+      return null;
+    }
     return _queue.removeFirst();
   }
 

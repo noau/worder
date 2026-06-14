@@ -5,6 +5,7 @@ import 'package:worder/entity/word_model.dart';
 import 'package:worder/page/add_word.dart';
 import 'package:worder/page/dashboard_page.dart';
 import 'package:worder/page/home.dart';
+import 'package:worder/page/learn_review_finish_page.dart';
 import 'package:worder/page/learn_review_page.dart';
 import 'package:worder/page/library_page.dart';
 import 'package:worder/page/settings_page.dart';
@@ -31,5 +32,9 @@ class AppRouter extends RootStackRouter {
     ),
     AutoRoute(page: AddWordRoute.page, path: '/add-word'),
     AutoRoute(page: LearnReviewRoute.page, path: '/learn-review'),
+    AutoRoute(
+      page: LearnReviewFinishRoute.page,
+      path: '/learn-review/finish',
+    ),
   ];
 }

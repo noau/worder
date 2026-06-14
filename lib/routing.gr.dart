@@ -59,6 +59,59 @@ class HomeRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [LearnReviewFinishPage]
+class LearnReviewFinishRoute extends PageRouteInfo<LearnReviewFinishRouteArgs> {
+  LearnReviewFinishRoute({
+    Key? key,
+    required int reviewedCount,
+    List<PageRouteInfo>? children,
+  }) : super(
+         LearnReviewFinishRoute.name,
+         args: LearnReviewFinishRouteArgs(
+           key: key,
+           reviewedCount: reviewedCount,
+         ),
+         initialChildren: children,
+       );
+
+  static const String name = 'LearnReviewFinishRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<LearnReviewFinishRouteArgs>();
+      return LearnReviewFinishPage(
+        key: args.key,
+        reviewedCount: args.reviewedCount,
+      );
+    },
+  );
+}
+
+class LearnReviewFinishRouteArgs {
+  const LearnReviewFinishRouteArgs({this.key, required this.reviewedCount});
+
+  final Key? key;
+
+  final int reviewedCount;
+
+  @override
+  String toString() {
+    return 'LearnReviewFinishRouteArgs{key: $key, reviewedCount: $reviewedCount}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! LearnReviewFinishRouteArgs) return false;
+    return key == other.key && reviewedCount == other.reviewedCount;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ reviewedCount.hashCode;
+}
+
+/// generated route for
 /// [LearnReviewPage]
 class LearnReviewRoute extends PageRouteInfo<LearnReviewRouteArgs> {
   LearnReviewRoute({
