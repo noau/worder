@@ -59,6 +59,55 @@ class HomeRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [LearnReviewPage]
+class LearnReviewRoute extends PageRouteInfo<LearnReviewRouteArgs> {
+  LearnReviewRoute({
+    Key? key,
+    required List<WordModel> words,
+    List<PageRouteInfo>? children,
+  }) : super(
+         LearnReviewRoute.name,
+         args: LearnReviewRouteArgs(key: key, words: words),
+         initialChildren: children,
+       );
+
+  static const String name = 'LearnReviewRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<LearnReviewRouteArgs>();
+      return LearnReviewPage(key: args.key, words: args.words);
+    },
+  );
+}
+
+class LearnReviewRouteArgs {
+  const LearnReviewRouteArgs({this.key, required this.words});
+
+  final Key? key;
+
+  final List<WordModel> words;
+
+  @override
+  String toString() {
+    return 'LearnReviewRouteArgs{key: $key, words: $words}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! LearnReviewRouteArgs) return false;
+    return key == other.key &&
+        const ListEquality<WordModel>().equals(words, other.words);
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^ const ListEquality<WordModel>().hash(words);
+}
+
+/// generated route for
 /// [LibraryPage]
 class LibraryRoute extends PageRouteInfo<void> {
   const LibraryRoute({List<PageRouteInfo>? children})

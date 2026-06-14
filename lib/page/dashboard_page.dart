@@ -1,10 +1,13 @@
 import 'dart:developer';
 
-import 'package:auto_route/annotations.dart';
+import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:worder/entity/word_model.dart';
+import 'package:worder/repository.dart';
+import 'package:worder/routing.dart';
 import 'package:worder/service.dart';
 import 'package:worder/widget/word_card.dart';
 
@@ -58,10 +61,87 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  // TODO: 接 Review / Learn session 路由后再改为真实入口
-  void _onReview() => BotToast.showText(text: 'Review session coming soon');
+  Future<void> _onReview() => _openReview();
 
-  void _onLearn() => BotToast.showText(text: 'Learn session coming soon');
+  Future<void> _onLearn() async {
+    final svc = context.read<WorderStorageService>();
+
+    // If review work is waiting, nudge the user — but always let them choose to
+    // learn anyway.
+    final int dueCount;
+    try {
+      dueCount = await svc.countDueReviewWords();
+    } catch (_) {
+      if (!mounted) return;
+      BotToast.showText(text: 'Could not load review status');
+      return;
+    }
+    if (!mounted) return;
+    if (dueCount > 0) {
+      final result = await showOkCancelAlertDialog(
+        context: context,
+        title: 'Review work waiting',
+        message: '$dueCount word${dueCount == 1 ? '' : 's'} '
+            '${dueCount == 1 ? 'is' : 'are'} due for review. '
+            'Review them first, or continue with learning?',
+        okLabel: 'Review',
+        cancelLabel: 'Continue learning',
+      );
+      if (!mounted) return;
+      if (result == OkCancelResult.ok) {
+        await _openReview();
+        return;
+      }
+      // cancel / dismissed → fall through to the learn batch below.
+    }
+
+    final prefs = context.read<PreferencesRepository>();
+    final List<WordModel> words;
+    try {
+      words = await svc.getLearningWords(limit: prefs.learnBatchSize);
+    } catch (_) {
+      if (!mounted) return;
+      BotToast.showText(text: 'Could not load learning words');
+      return;
+    }
+    if (!mounted) return;
+    if (words.isEmpty) {
+      await showOkAlertDialog(
+        context: context,
+        title: 'No new words yet',
+        message: 'You have no new words to learn right now. Try to add some new words!',
+      );
+      return;
+    }
+    context.pushRoute(LearnReviewRoute(words: words));
+  }
+
+  /// Fetch the due review batch and push the session page. Returns silently on
+  /// error (toast already shown) or unmount. Used by both the Review button
+  /// and the OK branch of the Learn-button's "review first" dialog. Shows a
+  /// dismiss-only "all caught up" dialog when the batch is empty.
+  Future<void> _openReview() async {
+    final svc = context.read<WorderStorageService>();
+    final prefs = context.read<PreferencesRepository>();
+    final List<WordModel> words;
+    try {
+      words = await svc.getDueReviewWords(limit: prefs.reviewBatchSize);
+    } catch (_) {
+      if (!mounted) return;
+      BotToast.showText(text: 'Could not load review words');
+      return;
+    }
+    if (!mounted) return;
+    if (words.isEmpty) {
+      await showOkAlertDialog(
+        context: context,
+        title: 'All caught up!',
+        message: 'You have no words due for review right now. Try to learn some new words!',
+      );
+      return;
+    }
+    context.pushRoute(LearnReviewRoute(words: words));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,8 +154,8 @@ class _DashboardPageState extends State<DashboardPage> {
         _StatsCard(
           expired: _expiredStream,
           reviewed: _reviewedTodayStream,
-          onReview: _onReview,
-          onLearn: _onLearn,
+          onReview: () => _onReview(),
+          onLearn: () => _onLearn(),
           onError: _logErr,
         ),
         const SizedBox(height: 24),

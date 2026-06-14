@@ -185,16 +185,38 @@ class WorderStorageService {
         .map((maps) => maps.map(WordModel.fromMap).toList());
   }
 
-  /// 获取当前 FSRS 到期需要复习的生词;目前无 in-tree 调用方。
-  /// 实时订阅请用 [watchExpiredWords];此占位保留以备未来一次性调用。
-  Future<List<WordModel>> getExpiredWords() async {
-    throw UnimplementedError("`getExpiredWords` is not implemented yet.");
+  /// 一次性获取当前 FSRS 到期需要复习的生词(供 Dashboard Review 入口调用);
+  /// where/order/limit 与 [watchExpiredWords] 一致,仅把 `.watch()` 换成 `.future`。
+  Future<List<WordModel>> getDueReviewWords({int limit = 20}) async {
+    final nowMs = DateTime.now().millisecondsSinceEpoch;
+    final result = await _db
+        .query(tableName)
+        .whereEqual(WordModel.colState, fsrs.State.review.value)
+        .whereLessThanOrEqualTo(WordModel.colDueTimestamp, nowMs)
+        .orderByAsc(WordModel.colDueTimestamp)
+        .limit(limit);
+    return result.data.map(WordModel.fromMap).toList();
   }
 
-  /// 获取全部收集的生词;目前无 in-tree 调用方。
-  /// 实时订阅请用 [watchAllWords];此占位保留以备未来一次性调用。
-  Future<List<WordModel>> getAllWords() async {
-    throw UnimplementedError("`getAllWords` is not implemented yet.");
+  /// 一次性获取学习状态的生词(供 Dashboard Learn 入口调用),
+  /// 按 create_timestamp 升序,优先取最早加入的。
+  Future<List<WordModel>> getLearningWords({int limit = 10}) async {
+    final result = await _db
+        .query(tableName)
+        .whereEqual(WordModel.colState, fsrs.State.learning.value)
+        .orderByAsc(WordModel.colCreateTimestamp)
+        .limit(limit);
+    return result.data.map(WordModel.fromMap).toList();
+  }
+
+  /// 统计当前到期 review 词数(不限 limit)。供 Learn 入口前的提示使用。
+  Future<int> countDueReviewWords() async {
+    final nowMs = DateTime.now().millisecondsSinceEpoch;
+    return _db
+        .query(tableName)
+        .whereEqual(WordModel.colState, fsrs.State.review.value)
+        .whereLessThanOrEqualTo(WordModel.colDueTimestamp, nowMs)
+        .count();
   }
 
   /// 删除生词
