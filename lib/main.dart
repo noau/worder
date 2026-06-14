@@ -43,11 +43,13 @@ void main() async {
 
   final savedThemeMode = await AdaptiveTheme.getThemeMode();
   final preferencesRepository = PreferencesRepository();
+  final schedulerRepository = SchedulerRepository();
   final worderStorageService = WorderStorageService();
   runApp(
     WorderApp(
       savedThemeMode: savedThemeMode,
       preferencesRepository: preferencesRepository,
+      schedulerRepository: schedulerRepository,
       worderStorageService: worderStorageService,
     ),
   );
@@ -58,11 +60,13 @@ class WorderApp extends StatelessWidget {
     super.key,
     required this.savedThemeMode,
     required this.preferencesRepository,
+    required this.schedulerRepository,
     required this.worderStorageService,
   });
 
   final AdaptiveThemeMode? savedThemeMode;
   final PreferencesRepository preferencesRepository;
+  final SchedulerRepository schedulerRepository;
   final WorderStorageService worderStorageService;
   final appRouter = AppRouter();
 
@@ -74,6 +78,7 @@ class WorderApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider.value(value: preferencesRepository),
+        Provider.value(value: schedulerRepository),
         Provider.value(value: worderStorageService),
       ],
       child: AdaptiveTheme(

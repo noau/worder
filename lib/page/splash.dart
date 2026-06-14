@@ -28,11 +28,14 @@ class SplashPage extends StatelessWidget {
       asyncNavigationCallback: () async {
         // Initializations
         final preferencesRepository = context.read<PreferencesRepository>();
+        final schedulerRepository = context.read<SchedulerRepository>();
         final worderStorageService = context.read<WorderStorageService>();
 
         log("Initializing PreferencesRepository...");
         await preferencesRepository.init();
-        log("Initializing PreferencesRepository...");
+        log("Initializing SchedulerRepository...");
+        await schedulerRepository.init();
+        log("Initializing WorderStorageService...");
         await worderStorageService.init();
 
         await Future.delayed(const Duration(seconds: 3));

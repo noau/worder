@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:developer';
 
+import 'package:fsrs/fsrs.dart' as fsrs;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:worder/entity/llm_config.dart';
 
@@ -31,5 +33,37 @@ class PreferencesRepository {
   }
 
   int get reviewBatchSize => _defaultReviewBatchSize;
+
   int get learnBatchSize => _defaultLearnBatchSize;
+}
+
+// TODO: We currently always uses default parameters for scheduler.
+//       However, later we may introduce fsrs optimizer which can
+//       automatically optimize scheduler to generate custom parameters
+//       for each user, so this is not over-engineering or YAGNI.
+class SchedulerRepository {
+  late SharedPreferences preferences;
+  late fsrs.Scheduler scheduler;
+
+  static const _schedulerKey = "fsrs.scheduler";
+
+  Future<void> init() async {
+    preferences = await SharedPreferences.getInstance();
+    final savedScheduler = preferences.getString(_schedulerKey);
+    if (savedScheduler != null) {
+      scheduler = fsrs.Scheduler.fromMap(jsonDecode(savedScheduler));
+    } else {
+      scheduler = fsrs.Scheduler();
+      await saveScheduler();
+    }
+  }
+
+  Future<void> saveScheduler() async {
+    if (!await preferences.setString(
+      _schedulerKey,
+      jsonEncode(scheduler.toMap()),
+    )) {
+      log("Failed to save scheduler.");
+    }
+  }
 }
