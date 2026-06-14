@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:fsrs/fsrs.dart' as fsrs;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:tostore/tostore.dart';
@@ -45,6 +46,13 @@ const wordSchema = TableSchema(
       nullable: false,
     ),
     FieldSchema(
+      name: WordModel.colState,
+      type: DataType.integer,
+      nullable: false,
+      defaultValue: WordModel.defaultStateValue,
+      createIndex: true,
+    ),
+    FieldSchema(
       name: WordModel.colCreateTimestamp,
       type: DataType.integer,
       nullable: false,
@@ -80,6 +88,12 @@ const wordSchema = TableSchema(
       indexName: 'idx_words_due', // 索引名，可选
       fields: [WordModel.colDueTimestamp], // 复合索引字段列表
       unique: false, // 是否唯一索引
+      type: IndexType.btree,
+    ),
+    IndexSchema(
+      indexName: 'idx_words_state',
+      fields: [WordModel.colState],
+      unique: false,
       type: IndexType.btree,
     ),
   ],
@@ -136,6 +150,7 @@ class WorderStorageService {
     final nowMs = DateTime.now().millisecondsSinceEpoch;
     return _db
         .query(tableName)
+        .whereEqual(WordModel.colState, fsrs.State.review.value)
         .whereLessThanOrEqualTo(WordModel.colDueTimestamp, nowMs)
         .orderByAsc(WordModel.colDueTimestamp)
         .limit(1000)
@@ -154,20 +169,6 @@ class WorderStorageService {
         .query(tableName)
         .whereBetween(WordModel.colLastReviewTimestamp, s, e)
         .orderByDesc(WordModel.colLastReviewTimestamp)
-        .limit(1000)
-        .watch()
-        .map((maps) => maps.map(WordModel.fromMap).toList());
-  }
-
-  /// 反应式订阅"今天"新学的生词(createAt 在 [todayStart, tomorrowStart])。
-  /// TODO: 当 Learn session 流程落地后,改用 fsrsCard.state 转换或新增 learned_at 列。
-  Stream<List<WordModel>> watchLearnedToday() {
-    final s = _todayLocalMidnight().millisecondsSinceEpoch;
-    final e = _tomorrowLocalMidnight().millisecondsSinceEpoch;
-    return _db
-        .query(tableName)
-        .whereBetween(WordModel.colCreateTimestamp, s, e)
-        .orderByDesc(WordModel.colCreateTimestamp)
         .limit(1000)
         .watch()
         .map((maps) => maps.map(WordModel.fromMap).toList());

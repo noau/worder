@@ -34,7 +34,6 @@ class _DashboardPageState extends State<DashboardPage> {
   // StreamBuilder on every parent rebuild.
   late final Stream<List<WordModel>> _expiredStream;
   late final Stream<List<WordModel>> _reviewedTodayStream;
-  late final Stream<List<WordModel>> _learnedTodayStream;
   late final Stream<List<WordModel>> _recentStream;
 
   // Dedupe key per (stream name, error). tostore may emit a new error
@@ -48,7 +47,6 @@ class _DashboardPageState extends State<DashboardPage> {
     final svc = context.read<WorderStorageService>();
     _expiredStream = svc.watchExpiredWords();
     _reviewedTodayStream = svc.watchReviewedToday();
-    _learnedTodayStream = svc.watchLearnedToday();
     _recentStream = svc.watchRecentlyReviewed();
   }
 
@@ -62,6 +60,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   // TODO: 接 Review / Learn session 路由后再改为真实入口
   void _onReview() => BotToast.showText(text: 'Review session coming soon');
+
   void _onLearn() => BotToast.showText(text: 'Learn session coming soon');
 
   @override
@@ -75,7 +74,6 @@ class _DashboardPageState extends State<DashboardPage> {
         _StatsCard(
           expired: _expiredStream,
           reviewed: _reviewedTodayStream,
-          learned: _learnedTodayStream,
           onReview: _onReview,
           onLearn: _onLearn,
           onError: _logErr,
@@ -134,7 +132,6 @@ class _StatsCard extends StatelessWidget {
   const _StatsCard({
     required this.expired,
     required this.reviewed,
-    required this.learned,
     required this.onReview,
     required this.onLearn,
     required this.onError,
@@ -142,7 +139,6 @@ class _StatsCard extends StatelessWidget {
 
   final Stream<List<WordModel>> expired;
   final Stream<List<WordModel>> reviewed;
-  final Stream<List<WordModel>> learned;
   final VoidCallback onReview;
   final VoidCallback onLearn;
   final void Function(String name, Object error) onError;
@@ -173,15 +169,6 @@ class _StatsCard extends StatelessWidget {
                       label: 'Cards reviewed today',
                       stream: reviewed,
                       streamName: 'reviewed',
-                      onError: onError,
-                    ),
-                  ),
-                  VerticalDivider(width: 1, color: dividerColor),
-                  Expanded(
-                    child: _StatCell(
-                      label: 'Cards learned today',
-                      stream: learned,
-                      streamName: 'learned',
                       onError: onError,
                     ),
                   ),

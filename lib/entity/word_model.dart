@@ -6,11 +6,17 @@ class WordModel {
   static const colWord = "word";
   static const colPinyin = "pinyin";
   static const colMeaning = "meaning";
+  static const colState = "state";
   static const colCreateTimestamp = "create_timestamp";
   static const colNotes = "notes";
   static const colFsrsCard = "fsrs_card";
   static const colDueTimestamp = "due_timestamp";
   static const colLastReviewTimestamp = "last_review_timestamp";
+
+  // colState 默认值。需要 const 字面量(schema 是 const 表达式),
+  // 因此不能直接写 fsrs.State.learning.value。该值必须与 fsrs.Card.create()
+  // 的默认 state(State.learning == 1)保持一致。
+  static const defaultStateValue = 1;
 
   final String id;
   final String word;
@@ -59,6 +65,7 @@ class WordModel {
       colWord: word,
       colPinyin: pinyin,
       colMeaning: meaning,
+      colState: fsrsCard.state.value,
       colCreateTimestamp: createAt.millisecondsSinceEpoch,
       colNotes: notes,
       colFsrsCard: fsrsCard.toMap(),
