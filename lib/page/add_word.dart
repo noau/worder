@@ -2,9 +2,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:fsrs/fsrs.dart' as fsrs;
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart' as uuid;
 import 'package:worder/entity/word_model.dart';
 import 'package:worder/service.dart';
 
@@ -79,13 +77,11 @@ class _AddWordPageState extends State<AddWordPage> {
     final pinyinText = _pinyinCtrl.text.trim();
     final meaningText = _meaningCtrl.text.trim();
     final noteText = _noteCtrl.text.trim();
-    final word = WordModel(
-      id: uuid.Uuid().v4(),
+    final word = await WordModel.create(
       word: wordText,
       pinyin: pinyinText,
       meaning: meaningText,
-      notes: noteText.isEmpty ? const <String>[] : [noteText],
-      fsrsCard: await fsrs.Card.create(),
+      note: noteText,
     );
     try {
       await dbService.saveWord(word);

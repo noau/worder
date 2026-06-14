@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +22,10 @@ class _LibraryPageState extends State<LibraryPage> {
   // return a new Stream per build, causing redundant re-subscriptions.
   Stream<List<WordModel>>? _stream;
 
+  // Track the last error we logged so the error branch in build() doesn't
+  // re-emit the same log line on every parent rebuild while the error persists.
+  Object? _lastLoggedError;
+
   @override
   void initState() {
     super.initState();
@@ -32,12 +38,20 @@ class _LibraryPageState extends State<LibraryPage> {
     });
   }
 
+  void _logErrorOnce(Object error) {
+    if (!identical(error, _lastLoggedError)) {
+      _lastLoggedError = error;
+      log("Failed to load words: $error");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<WordModel>>(
       stream: _stream,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
+          _logErrorOnce(snapshot.error!);
           return _ErrorState(onRetry: _retry);
         }
         if (snapshot.connectionState == ConnectionState.waiting &&

@@ -1,66 +1,118 @@
+import 'dart:developer';
+
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:tostore/tostore.dart';
 import 'package:worder/entity/word_model.dart';
 
 const wordSchema = TableSchema(
-  name: 'words',
+  name: WorderStorageService.tableName,
   primaryKeyConfig: PrimaryKeyConfig(
-    name: 'id',
+    name: WordModel.colId,
     type: PrimaryKeyType.none,
     isOrdered: false,
   ),
   fields: [
-    // FieldSchema(name: 'id', type: DataType.text, nullable: false, unique: true),
-    FieldSchema(name: 'word', type: DataType.text, nullable: false),
-    FieldSchema(name: 'pinyin', type: DataType.text, nullable: false),
-    FieldSchema(name: 'meaning', type: DataType.text, nullable: false),
+    FieldSchema(name: WordModel.colWord, type: DataType.text, nullable: false),
     FieldSchema(
-      name: 'due_timestamp',
+      name: WordModel.colPinyin,
+      type: DataType.text,
+      nullable: false,
+    ),
+    FieldSchema(
+      name: WordModel.colMeaning,
+      type: DataType.text,
+      nullable: false,
+    ),
+    FieldSchema(
+      name: WordModel.colNotes,
+      type: DataType.array,
+      nullable: false,
+    ),
+    FieldSchema(
+      name: WordModel.colFsrsCard,
+      type: DataType.json,
+      nullable: false,
+    ),
+    FieldSchema(
+      name: WordModel.colCreateTimestamp,
       type: DataType.integer,
       nullable: false,
       createIndex: true,
     ),
     FieldSchema(
-      name: 'last_review_timestamp',
+      name: WordModel.colDueTimestamp,
+      type: DataType.integer,
+      nullable: false,
+      createIndex: true,
+    ),
+    FieldSchema(
+      name: WordModel.colLastReviewTimestamp,
       type: DataType.integer,
       nullable: true,
       createIndex: true,
     ),
-    FieldSchema(name: 'notes_json', type: DataType.text, nullable: false),
-    FieldSchema(name: 'fsrs_card_json', type: DataType.text, nullable: false),
+  ],
+  indexes: [
+    IndexSchema(
+      indexName: 'idx_words_create', // 索引名，可选
+      fields: [WordModel.colCreateTimestamp], // 复合索引字段列表
+      unique: false, // 是否唯一索引
+      type: IndexType.btree,
+    ),
+    IndexSchema(
+      indexName: 'idx_words_last_review', // 索引名，可选
+      fields: [WordModel.colLastReviewTimestamp], // 复合索引字段列表
+      unique: false, // 是否唯一索引
+      type: IndexType.btree,
+    ),
+    IndexSchema(
+      indexName: 'idx_words_due', // 索引名，可选
+      fields: [WordModel.colDueTimestamp], // 复合索引字段列表
+      unique: false, // 是否唯一索引
+      type: IndexType.btree,
+    ),
   ],
 );
 
 class WorderStorageService {
   late final ToStore _db;
-  static const String _tableName = 'words';
+  static const String dbName = 'worder-db';
+  static const String tableName = 'words';
 
   // 初始化数据库
   Future<void> init() async {
-    _db = await ToStore.open(schemas: [wordSchema]);
+    final appDocsDir = await getApplicationDocumentsDirectory();
+    final dbPath = p.join(appDocsDir.path, "project-worder");
+    log("Opening database `$dbName` at `$dbPath`");
+    _db = await ToStore.open(
+      dbPath: dbPath,
+      dbName: dbName,
+      schemas: [wordSchema],
+      reinitialize: false,
+      noPersistOnClose: false,
+    );
   }
 
   Future<void> saveWord(WordModel word) async {
     final existing = await _db
-        .query(_tableName)
-        .whereEqual('id', word.id)
+        .query(tableName)
+        .whereEqual(WordModel.colId, word.id)
         .limit(1);
 
     if (existing.isNotEmpty) {
-      await _db.update(_tableName, word.toMap()).whereEqual('id', word.id);
+      await _db.update(tableName, word.toMap()).whereEqual(WordModel.colId, word.id);
     } else {
       // 不存在则直接插入
-      await _db.insert(_tableName, word.toMap());
+      await _db.insert(tableName, word.toMap());
     }
   }
 
-  /// 反应式订阅所有单词,按 id 倒序(新→旧);UI 层首选入口。
-  // NOTE: UUID v4 is not strictly time-ordered; in prototype scale (~hundreds of
-  // words) the imperfection is imperceptible. Add WordModel.createdAt +
-  // created_timestamp if/when ordering becomes visibly wrong.
+  /// 反应式订阅所有单词,按 create_timestamp 倒序(新→旧);UI 层首选入口。
   Stream<List<WordModel>> watchAllWords() {
     return _db
-        .query(_tableName)
-        .orderByDesc('id')
+        .query(tableName)
+        .orderByDesc(WordModel.colCreateTimestamp)
         .limit(1000)
         .watch()
         .map((maps) => maps.map(WordModel.fromMap).toList());
