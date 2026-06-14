@@ -1,12 +1,12 @@
 import 'dart:developer';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:worder/entity/word_model.dart';
 import 'package:worder/routing.dart';
 import 'package:worder/service.dart';
+import 'package:worder/widget/word_card.dart';
 
 @RoutePage()
 class LibraryPage extends StatefulWidget {
@@ -22,9 +22,9 @@ class _LibraryPageState extends State<LibraryPage> {
   // return a new Stream per build, causing redundant re-subscriptions.
   Stream<List<WordModel>>? _stream;
 
-  // Track the last error we logged so the error branch in build() doesn't
-  // re-emit the same log line on every parent rebuild while the error persists.
-  Object? _lastLoggedError;
+  // String fingerprint (not Object identity) so tostore's per-tick
+  // error instance doesn't bypass dedupe.
+  String? _lastLoggedFingerprint;
 
   @override
   void initState() {
@@ -39,8 +39,9 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   void _logErrorOnce(Object error) {
-    if (!identical(error, _lastLoggedError)) {
-      _lastLoggedError = error;
+    final fp = error.toString();
+    if (fp != _lastLoggedFingerprint) {
+      _lastLoggedFingerprint = fp;
       log("Failed to load words: $error");
     }
   }
@@ -67,7 +68,10 @@ class _LibraryPageState extends State<LibraryPage> {
           // breathing room, so the last row isn't hidden under the host FAB.
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
           itemCount: words.length,
-          itemBuilder: (_, i) => _WordRow(word: words[i]),
+          itemBuilder: (_, i) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: WordCard(word: words[i]),
+          ),
         );
       },
     );
@@ -166,57 +170,6 @@ class _EmptyState extends StatelessWidget {
               label: const Text('Add Word'),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _WordRow extends StatelessWidget {
-  const _WordRow({required this.word});
-
-  final WordModel word;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () => BotToast.showText(text: 'Detail view coming soon'),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.ideographic,
-                  spacing: 4,
-                  children: [
-                    Text(word.word, style: theme.textTheme.titleLarge),
-                    Text(
-                      word.pinyin,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  word.meaning,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colors.onSurfaceVariant,
-                  ),
-                  softWrap: true,
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );
