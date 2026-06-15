@@ -99,7 +99,7 @@ class _LearnReviewPageState extends State<LearnReviewPage> {
   Future<void> _confirmQuit() async {
     if (_currentWord == null) {
       // Session already ended; let the system back propagate.
-      context.maybePop();
+      context.pop();
       return;
     }
     final result = await showOkCancelAlertDialog(
@@ -113,7 +113,7 @@ class _LearnReviewPageState extends State<LearnReviewPage> {
     );
     if (!mounted) return;
     if (result == OkCancelResult.ok) {
-      context.maybePop();
+      context.pop();
     }
   }
 
