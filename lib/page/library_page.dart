@@ -3,9 +3,9 @@ import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:worder/database.dart';
 import 'package:worder/entity/word_model.dart';
 import 'package:worder/routing.dart';
-import 'package:worder/service.dart';
 import 'package:worder/widget/word_card.dart';
 
 @RoutePage()
@@ -29,12 +29,12 @@ class _LibraryPageState extends State<LibraryPage> {
   @override
   void initState() {
     super.initState();
-    _stream = context.read<WorderStorageService>().watchAllWords();
+    _stream = context.read<AppDatabase>().watchAllWords();
   }
 
   void _retry() {
     setState(() {
-      _stream = context.read<WorderStorageService>().watchAllWords();
+      _stream = context.read<AppDatabase>().watchAllWords();
     });
   }
 

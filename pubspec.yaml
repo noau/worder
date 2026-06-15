@@ -33,6 +33,8 @@ dependencies:
   collection: ^1.19.1
   animated_switcher_plus: ^1.4.0
   skeletonizer: ^2.1.3
+  drift: ^2.34.0
+  drift_flutter: ^0.3.0
 
 dev_dependencies:
   flutter_test:
@@ -43,6 +45,7 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.4
   auto_route_generator: ^10.5.0
   json_serializable: ^6.14.0
+  drift_dev: ^2.34.0
 
 flutter:
 

@@ -3,8 +3,8 @@ import 'package:auto_route/annotations.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:worder/database.dart';
 import 'package:worder/entity/word_model.dart';
-import 'package:worder/service.dart';
 
 @RoutePage()
 class AddWordPage extends StatefulWidget {
@@ -64,7 +64,7 @@ class _AddWordPageState extends State<AddWordPage> {
   }
 
   Future<void> _onConfirm() async {
-    final dbService = context.read<WorderStorageService>();
+    final dbService = context.read<AppDatabase>();
     final result = await showOkCancelAlertDialog(
       context: context,
       title: 'Save this word?',

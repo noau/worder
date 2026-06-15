@@ -5,10 +5,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:worder/database.dart';
 import 'package:worder/entity/word_model.dart';
 import 'package:worder/repository.dart';
 import 'package:worder/routing.dart';
-import 'package:worder/service.dart';
 import 'package:worder/widget/word_card.dart';
 
 const String _kSlogan = 'Every word, one step further.';
@@ -47,10 +47,10 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    final svc = context.read<WorderStorageService>();
-    _expiredStream = svc.watchExpiredWords();
-    _reviewedTodayStream = svc.watchReviewedToday();
-    _recentStream = svc.watchRecentlyReviewed();
+    final appDb = context.read<AppDatabase>();
+    _expiredStream = appDb.watchExpiredWords();
+    _reviewedTodayStream = appDb.watchReviewedToday();
+    _recentStream = appDb.watchRecentlyReviewed();
   }
 
   void _logErr(String name, Object e) {
@@ -64,13 +64,13 @@ class _DashboardPageState extends State<DashboardPage> {
   Future<void> _onReview() => _openReview();
 
   Future<void> _onLearn() async {
-    final svc = context.read<WorderStorageService>();
+    final svc = context.read<AppDatabase>();
 
     // If review work is waiting, nudge the user — but always let them choose to
     // learn anyway.
     final int dueCount;
     try {
-      dueCount = await svc.countDueReviewWords();
+      dueCount = await svc.getExpiredWordsCount();
     } catch (_) {
       if (!mounted) return;
       BotToast.showText(text: 'Could not load review status');
@@ -119,11 +119,11 @@ class _DashboardPageState extends State<DashboardPage> {
   /// and the OK branch of the Learn-button's "review first" dialog. Shows a
   /// dismiss-only "all caught up" dialog when the batch is empty.
   Future<void> _openReview() async {
-    final svc = context.read<WorderStorageService>();
+    final svc = context.read<AppDatabase>();
     final prefs = context.read<PreferencesRepository>();
     final List<WordModel> words;
     try {
-      words = await svc.getDueReviewWords(limit: prefs.reviewBatchSize);
+      words = await svc.getExpiredWords(limit: prefs.reviewBatchSize);
     } catch (_) {
       if (!mounted) return;
       BotToast.showText(text: 'Could not load review words');
@@ -236,7 +236,7 @@ class _StatsCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _StatCell(
-                      label: 'Cards need to review now',
+                      label: 'Need to Review',
                       stream: expired,
                       streamName: 'expired',
                       onError: onError,
@@ -245,7 +245,7 @@ class _StatsCard extends StatelessWidget {
                   VerticalDivider(width: 1, color: dividerColor),
                   Expanded(
                     child: _StatCell(
-                      label: 'Cards reviewed today',
+                      label: 'Reviewed Today',
                       stream: reviewed,
                       streamName: 'reviewed',
                       onError: onError,

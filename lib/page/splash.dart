@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:worder/repository.dart';
 import 'package:worder/routing.dart';
-import 'package:worder/service.dart';
 
 @RoutePage()
 class SplashPage extends StatelessWidget {
@@ -29,14 +28,11 @@ class SplashPage extends StatelessWidget {
         // Initializations
         final preferencesRepository = context.read<PreferencesRepository>();
         final schedulerRepository = context.read<SchedulerRepository>();
-        final worderStorageService = context.read<WorderStorageService>();
 
         log("Initializing PreferencesRepository...");
         await preferencesRepository.init();
         log("Initializing SchedulerRepository...");
         await schedulerRepository.init();
-        log("Initializing WorderStorageService...");
-        await worderStorageService.init();
 
         await Future.delayed(const Duration(seconds: 3));
       },

@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:fsrs/fsrs.dart' as fsrs;
+import 'package:worder/database.dart';
 import 'package:worder/entity/word_model.dart';
-import 'package:worder/service.dart';
 
 /// Owns one review/learn session's in-memory queue and FSRS scheduling.
 ///
@@ -49,7 +49,7 @@ import 'package:worder/service.dart';
 class LearningSessionManager {
   LearningSessionManager({
     required List<WordModel> initialWords,
-    required WorderStorageService storage,
+    required AppDatabase storage,
     required fsrs.Scheduler scheduler,
   }) : _storage = storage,
        _scheduler = scheduler,
@@ -61,7 +61,7 @@ class LearningSessionManager {
     }
   }
 
-  final WorderStorageService _storage;
+  final AppDatabase _storage;
   final fsrs.Scheduler _scheduler;
   final HeapPriorityQueue<WordModel> _queue;
 
@@ -87,7 +87,8 @@ class LearningSessionManager {
         .where(
           (w) =>
               !w.fsrsCard.due.isAfter(now) ||
-              w.fsrsCard.state == fsrs.State.learning,
+              w.fsrsCard.state == fsrs.State.learning ||
+              w.fsrsCard.state == fsrs.State.relearning,
         )
         .length;
   }
@@ -103,7 +104,9 @@ class LearningSessionManager {
       // If there's no word meets due, but still word at learning state,
       // return the earliest learning word.
       final firstLearning = _queue.unorderedElements.firstWhereOrNull(
-        (w) => w.fsrsCard.state == fsrs.State.learning,
+        (w) =>
+            w.fsrsCard.state == fsrs.State.learning ||
+            w.fsrsCard.state == fsrs.State.relearning,
       );
       if (firstLearning != null) {
         _queue.remove(firstLearning);

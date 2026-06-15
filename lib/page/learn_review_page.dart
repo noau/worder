@@ -8,11 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:fsrs/fsrs.dart' as fsrs;
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:worder/database.dart';
 import 'package:worder/entity/word_model.dart';
 import 'package:worder/manager/learning_session_manager.dart';
 import 'package:worder/repository.dart';
 import 'package:worder/routing.dart';
-import 'package:worder/service.dart';
 
 /// Hosts one Review / Learn session.
 ///
@@ -55,7 +55,7 @@ class _LearnReviewPageState extends State<LearnReviewPage> {
     super.initState();
     manager = LearningSessionManager(
       initialWords: widget.words,
-      storage: context.read<WorderStorageService>(),
+      storage: context.read<AppDatabase>(),
       scheduler: context.read<SchedulerRepository>().scheduler,
     );
     _loadNext();
