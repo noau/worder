@@ -39,9 +39,9 @@ class _DashboardPageState extends State<DashboardPage> {
   late final Stream<List<WordModel>> _reviewedTodayStream;
   late final Stream<List<WordModel>> _recentStream;
 
-  // Dedupe key per (stream name, error). tostore may emit a new error
-  // instance per tick — string fingerprint survives that. Different streams
-  // with different errors each get logged once independently.
+  // Dedupe key per (stream name, error). The storage backend may emit a new
+  // error instance per tick — string fingerprint survives that. Different
+  // streams with different errors each get logged once independently.
   String? _lastLoggedFingerprint;
 
   @override

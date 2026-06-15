@@ -22,7 +22,7 @@ class _LibraryPageState extends State<LibraryPage> {
   // return a new Stream per build, causing redundant re-subscriptions.
   Stream<List<WordModel>>? _stream;
 
-  // String fingerprint (not Object identity) so tostore's per-tick
+  // String fingerprint (not Object identity) so the storage backend's per-tick
   // error instance doesn't bypass dedupe.
   String? _lastLoggedFingerprint;
 

@@ -1093,14 +1093,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.7.11"
-  tostore:
-    dependency: "direct main"
-    description:
-      name: tostore
-      sha256: "745f217424118059d80b90eb9ebf34ce1492068659eb8bd94717e5593e5aa4bb"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "3.1.2"
   typed_data:
     dependency: transitive
     description:
