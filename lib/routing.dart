@@ -10,6 +10,7 @@ import 'package:worder/page/learn_review_page.dart';
 import 'package:worder/page/library_page.dart';
 import 'package:worder/page/settings_page.dart';
 import 'package:worder/page/splash.dart';
+import 'package:worder/page/word_detail_page.dart';
 
 part 'routing.gr.dart';
 
@@ -33,5 +34,6 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: AddWordRoute.page, path: '/add-word'),
     AutoRoute(page: LearnReviewRoute.page, path: '/learn-review'),
     AutoRoute(page: LearnReviewFinishRoute.page, path: '/learn-review/finish'),
+    AutoRoute(page: WordDetailRoute.page, path: '/word-detail'),
   ];
 }

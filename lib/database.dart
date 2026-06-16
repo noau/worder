@@ -160,6 +160,11 @@ class AppDatabase extends _$AppDatabase {
         .map((rows) => rows.map((row) => row.toDomain()).toList());
   }
 
+  Stream<WordModel?> watchWord({required String wordId}) => managers.wordRows
+      .filter((r) => r.id(wordId))
+      .map((r) => r.toDomain())
+      .watchSingleOrNull();
+
   Stream<List<WordModel>> watchExpiredWords() {
     return (select(wordRows)
           ..where((r) => r.state.equals(WordState.reviewing.index))

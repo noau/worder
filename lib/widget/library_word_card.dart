@@ -1,16 +1,21 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:worder/entity/word_model.dart';
 
 /// Library 标签页专用卡片。
 ///
-/// 视觉与原 [WordCard] 一致(后续可能与 Dashboard 卡片分化)。
-/// - onTap:暂保留 'Detail view coming soon' BotToast 占位,与原行为一致。
+/// 视觉与 Dashboard 卡片保持一致(后续可能分化)。
+/// - onTap:由 LibraryPage 注入,跳转到 WordDetailPage。
 /// - onLongPress:由 LibraryPage 注入,触发底部动作面板。
 class LibraryWordCard extends StatelessWidget {
-  const LibraryWordCard({super.key, required this.word, this.onLongPress});
+  const LibraryWordCard({
+    super.key,
+    required this.word,
+    this.onTap,
+    this.onLongPress,
+  });
 
   final WordModel word;
+  final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
   @override
@@ -20,7 +25,7 @@ class LibraryWordCard extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => BotToast.showText(text: 'Detail view coming soon'),
+        onTap: onTap,
         onLongPress: onLongPress,
         child: Padding(
           padding: const EdgeInsets.all(16),

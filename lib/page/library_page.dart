@@ -114,6 +114,7 @@ class _LibraryPageState extends State<LibraryPage> {
               padding: const EdgeInsets.only(bottom: 12),
               child: LibraryWordCard(
                 word: words[i],
+                onTap: () => context.pushRoute(WordDetailRoute(word: words[i])),
                 onLongPress: () => _openActions(context, words[i]),
               ),
             ),

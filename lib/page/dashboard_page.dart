@@ -371,7 +371,10 @@ class _RecentSection extends StatelessWidget {
                 for (final w in words)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: DashboardWordCard(word: w),
+                    child: DashboardWordCard(
+                      word: w,
+                      onTap: () => context.pushRoute(WordDetailRoute(word: w)),
+                    ),
                   ),
               ],
             );

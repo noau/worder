@@ -207,3 +207,50 @@ class SplashRoute extends PageRouteInfo<void> {
     },
   );
 }
+
+/// generated route for
+/// [WordDetailPage]
+class WordDetailRoute extends PageRouteInfo<WordDetailRouteArgs> {
+  WordDetailRoute({
+    Key? key,
+    required WordModel word,
+    List<PageRouteInfo>? children,
+  }) : super(
+         WordDetailRoute.name,
+         args: WordDetailRouteArgs(key: key, word: word),
+         initialChildren: children,
+       );
+
+  static const String name = 'WordDetailRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<WordDetailRouteArgs>();
+      return WordDetailPage(key: args.key, word: args.word);
+    },
+  );
+}
+
+class WordDetailRouteArgs {
+  const WordDetailRouteArgs({this.key, required this.word});
+
+  final Key? key;
+
+  final WordModel word;
+
+  @override
+  String toString() {
+    return 'WordDetailRouteArgs{key: $key, word: $word}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! WordDetailRouteArgs) return false;
+    return key == other.key && word == other.word;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ word.hashCode;
+}
