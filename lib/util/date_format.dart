@@ -23,6 +23,15 @@ String formatRelative(DateTime utc, {DateTime? now}) {
   final n = (now ?? DateTime.now()).toUtc();
   final diff = utc.difference(n);
   if (diff.inSeconds.abs() < 60) return 'now';
+  // FIXME(review#6): Duration.inDays 只返回整天数。duration 落在 (−24h, 0)
+  // 或 (0, +24h) 时都被折叠成 days == 0 → 'just now'。结果:一张 23h overdue
+  // 的卡片显示 "just now" 而不是 "overdue by 1 day",23h 后的新 due 也只
+  // 显示 "just now" 而不是 "in 1 day"。FSRS 调度可视化的 overdue 信号被吞掉。
+  //
+  // 修复方案:把 "just now" 的语义收紧到 <1h,大于 1h 的 sub-day 部分
+  // 应该显示 "in N hours" / "overdue by N hours";或者把 cutoff 从
+  // 24h 改为 (24h − 1min) 让 23h59m 算 1 day。语义取决于你想表达什么
+  // —— "just now" 应该非常短(< 几小时),还是"同日"(< 24h)。
   final days = diff.inDays;
   if (days == 0) return 'just now';
   if (days > 0) return 'in $days day${days == 1 ? '' : 's'}';

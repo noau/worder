@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
@@ -9,6 +10,7 @@ import 'package:worder/database.dart';
 import 'package:worder/entity/word_model.dart';
 import 'package:worder/repository.dart';
 import 'package:worder/routing.dart';
+import 'package:worder/util/day_rollover_stream.dart';
 import 'package:worder/widget/dashboard_word_card.dart';
 
 const String _kSlogan = 'Every word, one step further.';
@@ -16,6 +18,14 @@ const String _kSlogan = 'Every word, one step further.';
 // TODO: 真实首启日期或 Settings 选项
 const int _kDaysUsingApp = 7;
 
+// FIXME(review#8): 这个 _formatDate 与 lib/util/date_format.dart 的
+// formatAbsoluteDate 字节级重复。同时 lib/util/day_rollover_stream.dart
+// 的 _todayLocalMidnight 与 lib/database.dart:15 的同名私有 helper 也重复。
+// 两处都自承(date_format.dart 头注释 + dashboard_page.dart 的旧 TODO)。
+//
+// 修复方案:把 todayLocalMidnight() 和 formatAbsoluteDate() 都暴露为 public
+// util(放到 lib/util/date_format.dart),dashboard_page.dart 和
+// day_rollover_stream.dart 改成 import 公共版本,删除本地重复实现。
 String _formatDate(DateTime d) {
   final l = d.toLocal();
   final m = l.month.toString().padLeft(2, '0');
@@ -32,12 +42,31 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  late final AppDatabase _db;
+  late final AppLifecycleListener _lifecycleListener;
+  late final DayRolloverNotifier _rolloverNotifier;
+  late final StreamSubscription<DateTime> _rolloverSubscription;
+
   // Cached so build() never recreates a new stream subscription. Same pattern
   // as LibraryPage — calling watchXxx() in build() would churn the
   // StreamBuilder on every parent rebuild.
-  late final Stream<List<WordModel>> _expiredStream;
-  late final Stream<List<WordModel>> _reviewedTodayStream;
-  late final Stream<List<WordModel>> _recentStream;
+  late Stream<List<WordModel>> _expiredStream;
+  late Stream<List<WordModel>> _reviewedTodayStream;
+  late Stream<List<WordModel>> _recentStream;
+
+  // 当前 local date。DayRolloverNotifier 只在跨过 midnight 时发一次,
+  // 用 setState 驱动的字段即可,不需要 StreamBuilder。
+  //
+  // BUG FIX (review#1): 之前的代码把 _Header 包在 StreamBuilder 里,StreamBuilder
+  // 又订阅了 `_rolloverNotifier.stream`。而 initState 里已经 `.listen()` 同一个
+  // 单订阅流(StreamController 默认 + .distinct() 不改变订阅模式),build() 时
+  // 第二次订阅立即抛 `Bad state: Stream has already been listened to`,
+  // Dashboard 标签页首次进入即崩溃。
+  //
+  // 修法:把 header 从 StreamBuilder 改成读 `_currentDate`,统一只保留
+  // initState 里那一次 `.listen()`,在 `_refreshStreamOnDateRollover` 里
+  // setState 同时刷新三个数据流 + 这个字段。
+  DateTime _currentDate = DateTime.now();
 
   // Dedupe key per (stream name, error). The storage backend may emit a new
   // error instance per tick — string fingerprint survives that. Different
@@ -47,10 +76,45 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    final appDb = context.read<AppDatabase>();
-    _expiredStream = appDb.watchExpiredWords();
-    _reviewedTodayStream = appDb.watchReviewedToday();
-    _recentStream = appDb.watchRecentlyReviewed();
+    _db = context.read<AppDatabase>();
+    _expiredStream = _db.watchExpiredWords();
+    _reviewedTodayStream = _db.watchReviewedToday();
+    _recentStream = _db.watchRecentlyReviewed();
+    _rolloverNotifier = dayRolloverNotifier();
+    _rolloverSubscription = _rolloverNotifier.stream.listen(
+      _refreshStreamOnDateRollover,
+    );
+    // FIXME(review#7): AppLifecycleListener.onResume 只在 OS 派发窗口生命周期
+    // 事件(激活、最小化恢复)时触发。Windows 在前台聚焦状态下穿过午夜不会
+    // 触发 onResume(OS 不知道 wall-clock)。所以跨午夜后唯一兜底是
+    // day_rollover_stream 的 1 分钟周期 timer,最多 ~60s 的 watchReviewedToday
+    // 窗口错位。
+    //
+    // 修复方案:把 timer 周期从 1 分钟降到 10~30 秒,把窗口错位压到不可感知;
+    // 或者在 initState 里算一次 "下次 midnight 的 Duration",挂一次性 Timer
+    // 而不是周期 timer,精度更高、wakeup 更少。
+    _lifecycleListener = AppLifecycleListener(onResume: _handleLifecycleResume);
+  }
+
+  @override
+  void dispose() {
+    _rolloverSubscription.cancel();
+    _lifecycleListener.dispose();
+    super.dispose();
+  }
+
+  void _refreshStreamOnDateRollover(DateTime date) {
+    if (!mounted) return;
+    setState(() {
+      _currentDate = date;
+      _expiredStream = _db.watchExpiredWords();
+      _reviewedTodayStream = _db.watchReviewedToday();
+      _recentStream = _db.watchRecentlyReviewed();
+    });
+  }
+
+  void _handleLifecycleResume() {
+    _rolloverNotifier.triggerCheck();
   }
 
   void _logErr(String name, Object e) {
@@ -144,12 +208,18 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    final date = _formatDate(DateTime.now());
     return SafeArea(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
         children: [
-          _Header(date: date, days: _kDaysUsingApp),
+          // _currentDate 由 _refreshStreamOnDateRollover 在 midnight 时 setState
+          // 更新。无需 StreamBuilder(每天最多更新一次,StreamBuilder 是 overkill)。
+          // BUG FIX (review#1): 之前的 StreamBuilder + initState `.listen()` 双订阅
+          // 单订阅流导致首次 build 崩溃。已重构为本字段 + 单一 listener。
+          _Header(
+            date: _formatDate(_currentDate),
+            days: _kDaysUsingApp,
+          ),
           const SizedBox(height: 16),
           _StatsCard(
             expired: _expiredStream,

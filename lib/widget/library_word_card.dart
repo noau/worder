@@ -7,6 +7,12 @@ import 'package:worder/entity/word_model.dart';
 /// - onTap:由 LibraryPage 注入,跳转到 WordDetailPage。
 /// - onLongPress:由 LibraryPage 注入,触发底部动作面板。
 class LibraryWordCard extends StatelessWidget {
+  // FIXME(review#9): 本 widget 与 DashboardWordCard 除了 onLongPress 一个
+  // 参数之外完全字节级相同。"后续可能分化" 至今未发生,任何视觉调整必须同步两份。
+  //
+  // 修复方案:合并成一个 WordCard(word, {VoidCallback? onTap, VoidCallback?
+  // onLongPress}) 组件,两个调用方分别只传自己关心的参数,删除本类与
+  // DashboardWordCard 的其中之一。
   const LibraryWordCard({
     super.key,
     required this.word,
@@ -15,6 +21,14 @@ class LibraryWordCard extends StatelessWidget {
   });
 
   final WordModel word;
+  // FIXME(review#10): onTap 是 nullable VoidCallback,InkWell(onTap: null)
+  // 完全静默(无 ripple、无响应)。原版本有 BotToast stub 'Detail view coming
+  // soon'——即便 detail 页未实现,点 card 至少有个 toast 自检信号;新版本
+  // 删掉 stub 改为 nullable,未来调用方漏传会变成死 UI(无任何反馈)。
+  //
+  // 修复方案:把 onTap 改成 required(强制每个调用方显式传入);
+  // 或者保留 nullable 但在 InkWell 外包一个 Builder,onTap 为 null 时
+  // 展示一个 disabled 视觉提示。
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 

@@ -88,6 +88,16 @@ class _WordDetailPageState extends State<WordDetailPage> {
       useSafeArea: true,
       builder: (_) => _NoteActionsSheet(
         word: _latest,
+        // FIXME(review#3): `index` 是 long-press 时闭包捕获的原始 int,
+        // 而 _deleteNote / _moveNoteToTop 在调用时读 _latest.notes。
+        // 如果 long-press 与点击之间 watchWord 因 drift 任何写入(比如
+        // LearningSessionManager 在 review 页 saveWord)重新发射,
+        // _latest.notes 会变成新列表,被闭包捕获的 index 指向另一条 note,
+        // 造成 wrong note silently deleted / moved-to-top。
+        //
+        // 修复方案:把 notes snapshot(而非 index)传给 sheet,sheet 的
+        // onDelete/onMoveToTop 在调用时基于该 snapshot 操作,或者干脆把
+        // _deleteNote 改成按 note id 而非 index 操作。
         noteIndex: index,
         onEdit: () => _openNoteEditor(
           initialText: _latest.notes[index],
@@ -102,6 +112,11 @@ class _WordDetailPageState extends State<WordDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // FIXME(review#5): AppBar title 读 widget.word.word(路由参数快照,构造时锁定),
+      // body 内的 StreamBuilder 读 stream。两者没有共享 notifier,如果 word 字段
+      // 被别处更新(未来增加 edit word 功能、或 drift 流重新发射)会导致 title/body
+      // 不一致。修复方案:把 AppBar 也包进 StreamBuilder,或用 ValueNotifier
+      // 把 widget.word 提升为可变 state 并在每次 snapshot.data 到达时更新。
       appBar: AppBar(title: Text(widget.word.word)),
       body: SafeArea(
         child: StreamBuilder<WordModel?>(
@@ -145,6 +160,16 @@ class _WordDetailPageState extends State<WordDetailPage> {
           },
         ),
       ),
+      // FIXME(review#2): 当 watchWord 因别处删除该 word 而发 null 时,
+      // builder 返回 SizedBox.shrink() 并通过 addPostFrameCallback 延迟
+      // 到下一帧才 context.pop()。但 FAB 是 Scaffold 的直接子节点,
+      // 不在 StreamBuilder 内,这一帧内仍可点击。如果用户点了 FAB → 打开
+      // editor → 保存,editor 走 `db.saveWord(widget.word.copyWith(...))`,
+      // saveWord 的 insertOnConflictUpdate 会用原 id 重新插入该行,
+      // 静默复活已删除的 word。
+      //
+      // 修复方案:在 word==null && snapshot.hasData 分支里把 FAB 禁用,
+      // 或者把 _NoteEditorSheet 的保存路径加一个 `if (!_latest.alive) return;` 守卫。
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openNoteEditor(),
         tooltip: 'New note',
@@ -629,6 +654,15 @@ class _NoteEditorSheetState extends State<_NoteEditorSheet> {
     setState(() => _isSaving = true);
     final db = context.read<AppDatabase>();
     final text = _controller.text.trim();
+    // FIXME(review#4): 用的是 widget.word.notes(sheet 构造时的快照)而不是父级
+    // _latest.notes。父级 _saveNotes 读的是 _latest.notes。两个 writer 各自
+    // 调 db.saveWord,drift 的 insertOnConflictUpdate 是 last-write-wins,
+    // 先写入的笔记会被后写入的覆盖,导致 silent data loss。
+    //
+    // 修复方案:sheet 构造时把当前 _latest 缓存到 State 的一个 field(在
+    // didChangeDependencies 或 initState 里读),save 走 `_latest.copyWith(...)`
+    // 而不是 widget.word.copyWith(...);或者去掉 editIndex 路径,改用 note id
+    // (但 WordModel.notes 当前是 List<String>,没有 id 字段,需要 schema 升级)。
     final notes = [...widget.word.notes];
     if (_isEdit) {
       notes[widget.editIndex!] = text;
