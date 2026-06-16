@@ -145,21 +145,23 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     final date = _formatDate(DateTime.now());
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
-      children: [
-        _Header(date: date, days: _kDaysUsingApp),
-        const SizedBox(height: 16),
-        _StatsCard(
-          expired: _expiredStream,
-          reviewed: _reviewedTodayStream,
-          onReview: () => _onReview(),
-          onLearn: () => _onLearn(),
-          onError: _logErr,
-        ),
-        const SizedBox(height: 24),
-        _RecentSection(stream: _recentStream, onError: _logErr),
-      ],
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+        children: [
+          _Header(date: date, days: _kDaysUsingApp),
+          const SizedBox(height: 16),
+          _StatsCard(
+            expired: _expiredStream,
+            reviewed: _reviewedTodayStream,
+            onReview: () => _onReview(),
+            onLearn: () => _onLearn(),
+            onError: _logErr,
+          ),
+          const SizedBox(height: 24),
+          _RecentSection(stream: _recentStream, onError: _logErr),
+        ],
+      ),
     );
   }
 }

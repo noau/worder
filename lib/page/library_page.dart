@@ -48,32 +48,34 @@ class _LibraryPageState extends State<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<WordModel>>(
-      stream: _stream,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          _logErrorOnce(snapshot.error!);
-          return _ErrorState(onRetry: _retry);
-        }
-        if (snapshot.connectionState == ConnectionState.waiting &&
-            !snapshot.hasData) {
-          return const _LoadingSkeleton();
-        }
-        final words = snapshot.data ?? const <WordModel>[];
-        if (words.isEmpty) {
-          return const _EmptyState();
-        }
-        return ListView.builder(
-          // 96px bottom padding = FAB (56) + standard margin (16) + extra
-          // breathing room, so the last row isn't hidden under the host FAB.
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
-          itemCount: words.length,
-          itemBuilder: (_, i) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: WordCard(word: words[i]),
-          ),
-        );
-      },
+    return SafeArea(
+      child: StreamBuilder<List<WordModel>>(
+        stream: _stream,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            _logErrorOnce(snapshot.error!);
+            return _ErrorState(onRetry: _retry);
+          }
+          if (snapshot.connectionState == ConnectionState.waiting &&
+              !snapshot.hasData) {
+            return const _LoadingSkeleton();
+          }
+          final words = snapshot.data ?? const <WordModel>[];
+          if (words.isEmpty) {
+            return const _EmptyState();
+          }
+          return ListView.builder(
+            // 96px bottom padding = FAB (56) + standard margin (16) + extra
+            // breathing room, so the last row isn't hidden under the host FAB.
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+            itemCount: words.length,
+            itemBuilder: (_, i) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: WordCard(word: words[i]),
+            ),
+          );
+        },
+      ),
     );
   }
 }

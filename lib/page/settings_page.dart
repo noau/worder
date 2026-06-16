@@ -98,102 +98,104 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final themeMode = AdaptiveTheme.of(context).mode;
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Theme', style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 16),
-                SegmentedButton<AdaptiveThemeMode>(
-                  segments: const [
-                    ButtonSegment(
-                      value: AdaptiveThemeMode.light,
-                      label: Text('Light'),
-                    ),
-                    ButtonSegment(
-                      value: AdaptiveThemeMode.dark,
-                      label: Text('Dark'),
-                    ),
-                    ButtonSegment(
-                      value: AdaptiveThemeMode.system,
-                      label: Text('System'),
-                    ),
-                  ],
-                  selected: {themeMode},
-                  onSelectionChanged: (selection) {
-                    AdaptiveTheme.of(context).setThemeMode(selection.first);
-                  },
-                ),
-              ],
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Theme', style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 16),
+                  SegmentedButton<AdaptiveThemeMode>(
+                    segments: const [
+                      ButtonSegment(
+                        value: AdaptiveThemeMode.light,
+                        label: Text('Light'),
+                      ),
+                      ButtonSegment(
+                        value: AdaptiveThemeMode.dark,
+                        label: Text('Dark'),
+                      ),
+                      ButtonSegment(
+                        value: AdaptiveThemeMode.system,
+                        label: Text('System'),
+                      ),
+                    ],
+                    selected: {themeMode},
+                    onSelectionChanged: (selection) {
+                      AdaptiveTheme.of(context).setThemeMode(selection.first);
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 16),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'AI Configuration',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Only OpenAI-compatible APIs are supported.',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _baseURLController,
-                  focusNode: _baseURLFocus,
-                  decoration: const InputDecoration(
-                    labelText: 'Base URL',
-                    border: OutlineInputBorder(),
+          const SizedBox(height: 16),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'AI Configuration',
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _apiKeyController,
-                  focusNode: _apiKeyFocus,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'API Key',
-                    helperText: 'Hidden for privacy',
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Only OpenAI-compatible APIs are supported.',
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _modelController,
-                  focusNode: _modelFocus,
-                  decoration: const InputDecoration(
-                    labelText: 'Model',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: ValueListenableBuilder<bool>(
-                    valueListenable: _canTest,
-                    builder: (_, canTest, _) => FilledButton.tonal(
-                      onPressed: canTest ? _onTest : null,
-                      child: const Text('Test'),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _baseURLController,
+                    focusNode: _baseURLFocus,
+                    decoration: const InputDecoration(
+                      labelText: 'Base URL',
+                      border: OutlineInputBorder(),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _apiKeyController,
+                    focusNode: _apiKeyFocus,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'API Key',
+                      helperText: 'Hidden for privacy',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _modelController,
+                    focusNode: _modelFocus,
+                    decoration: const InputDecoration(
+                      labelText: 'Model',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ValueListenableBuilder<bool>(
+                      valueListenable: _canTest,
+                      builder: (_, canTest, _) => FilledButton.tonal(
+                        onPressed: canTest ? _onTest : null,
+                        child: const Text('Test'),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

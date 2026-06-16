@@ -1,8 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+      LLM (dart_openai) calls require INTERNET at runtime.
+      Declared here in main (not just debug/profile) so release builds also have it.
+    -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:label="worder"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
