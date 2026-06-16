@@ -32,9 +32,6 @@ class AppRouter extends RootStackRouter {
     ),
     AutoRoute(page: AddWordRoute.page, path: '/add-word'),
     AutoRoute(page: LearnReviewRoute.page, path: '/learn-review'),
-    AutoRoute(
-      page: LearnReviewFinishRoute.page,
-      path: '/learn-review/finish',
-    ),
+    AutoRoute(page: LearnReviewFinishRoute.page, path: '/learn-review/finish'),
   ];
 }

@@ -147,6 +147,13 @@ class AppDatabase extends _$AppDatabase {
   Future<int> saveWord(WordModel word) =>
       into(wordRows).insertOnConflictUpdate(word.toDbCompanion());
 
+  /// Deletes [word] from the wordRows table by its primary key.
+  ///
+  /// Returns the number of rows affected. The `watchAllWords` stream will
+  /// auto-emit a refreshed list, so callers don't need to refresh manually.
+  Future<int> deleteWord(WordModel word) =>
+      (delete(wordRows)..where((r) => r.id.equals(word.id))).go();
+
   Stream<List<WordModel>> watchAllWords() {
     return (select(wordRows)..orderBy([(r) => OrderingTerm.desc(r.createAt)]))
         .watch()

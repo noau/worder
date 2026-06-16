@@ -9,7 +9,7 @@ import 'package:worder/database.dart';
 import 'package:worder/entity/word_model.dart';
 import 'package:worder/repository.dart';
 import 'package:worder/routing.dart';
-import 'package:worder/widget/word_card.dart';
+import 'package:worder/widget/dashboard_word_card.dart';
 
 const String _kSlogan = 'Every word, one step further.';
 
@@ -371,7 +371,7 @@ class _RecentSection extends StatelessWidget {
                 for (final w in words)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: WordCard(word: w),
+                    child: DashboardWordCard(word: w),
                   ),
               ],
             );

@@ -1,12 +1,14 @@
 import 'dart:developer';
 
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:worder/database.dart';
 import 'package:worder/entity/word_model.dart';
 import 'package:worder/routing.dart';
-import 'package:worder/widget/word_card.dart';
+import 'package:worder/widget/library_word_card.dart';
 
 @RoutePage()
 class LibraryPage extends StatefulWidget {
@@ -17,6 +19,9 @@ class LibraryPage extends StatefulWidget {
 }
 
 class _LibraryPageState extends State<LibraryPage> {
+  static const _deletedMessage = 'Deleted';
+  static const _deleteErrorMessage = 'Failed to delete the word';
+
   // Cached so _retry can replace it with a fresh stream and trigger
   // StreamBuilder to re-subscribe. Calling watchAllWords() in build() would
   // return a new Stream per build, causing redundant re-subscriptions.
@@ -46,6 +51,42 @@ class _LibraryPageState extends State<LibraryPage> {
     }
   }
 
+  Future<void> _openActions(BuildContext context, WordModel word) {
+    return showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      useSafeArea: true,
+      constraints: BoxConstraints(minHeight: 360),
+      builder: (_) => _CardActionsSheet(
+        word: word,
+        onDelete: () => _confirmDelete(context, word),
+      ),
+    );
+  }
+
+  Future<void> _confirmDelete(BuildContext context, WordModel word) async {
+    final db = context.read<AppDatabase>();
+    final ok = await showOkCancelAlertDialog(
+      context: context,
+      title: 'Delete this word?',
+      message:
+          '"${word.word}" will be removed from your library. This cannot be undone.',
+      okLabel: 'Delete',
+      cancelLabel: 'Cancel',
+      isDestructiveAction: true,
+    );
+    if (ok != OkCancelResult.ok) return;
+    try {
+      await db.deleteWord(word);
+    } catch (_) {
+      if (!mounted) return;
+      BotToast.showText(text: _deleteErrorMessage);
+      return;
+    }
+    if (!mounted) return;
+    BotToast.showText(text: _deletedMessage);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -71,7 +112,10 @@ class _LibraryPageState extends State<LibraryPage> {
             itemCount: words.length,
             itemBuilder: (_, i) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: WordCard(word: words[i]),
+              child: LibraryWordCard(
+                word: words[i],
+                onLongPress: () => _openActions(context, words[i]),
+              ),
             ),
           );
         },
@@ -173,6 +217,55 @@ class _EmptyState extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _CardActionsSheet extends StatelessWidget {
+  const _CardActionsSheet({required this.word, required this.onDelete});
+
+  final WordModel word;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final error = theme.colorScheme.error;
+    return SafeArea(
+      top: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.ideographic,
+              spacing: 4,
+              children: [
+                Text(word.word, style: theme.textTheme.titleLarge),
+                Text(
+                  word.pinyin,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: Icon(Icons.delete_outline, color: error),
+            title: Text('Delete', style: TextStyle(color: error)),
+            onTap: () {
+              Navigator.of(context).pop();
+              onDelete();
+            },
+          ),
+          // 未来动作追加在这里,无需改其他结构。
+        ],
       ),
     );
   }
