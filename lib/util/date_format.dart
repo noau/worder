@@ -1,14 +1,40 @@
-// 日期格式化工具。
+// 日期工具。
 //
-// 与 `dashboard_page.dart` 内私有的 `_formatDate` 输出格式一致
-// (`YYYY/MM/DD`,UTC 转为本地时区,月日补零),便于在详情页等位置复用。
+// 包含:
+// - 日期格式化(formatAbsoluteDate / formatRelative)
+// - local-time 的 "start of day" 算术(startOfLocalDay / startOfNextLocalDay)
 
-/// 将 UTC [DateTime] 转为本地时区并格式化为 `YYYY/MM/DD`。
-String formatAbsoluteDate(DateTime utc) {
-  final l = utc.toLocal();
+/// 将任意 [DateTime] 转为本地时区并格式化为 `YYYY/MM/DD`。
+///
+/// 对已经是 local time 的 [DateTime] 是 no-op;对 UTC [DateTime] 会先
+/// 转换时区。参数名刻意不用 `utc`,因为函数对两种输入都正确 —— 调用方
+/// 不需要先做时区分拣。
+String formatAbsoluteDate(DateTime dt) {
+  final l = dt.toLocal();
   final m = l.month.toString().padLeft(2, '0');
   final d = l.day.toString().padLeft(2, '0');
   return '${l.year}/$m/$d';
+}
+
+/// Returns the start of the local day for [source] (defaults to now).
+///
+/// 返回结果与时区无关:`DateTime(year, month, day)` 构造在 local time 下,
+/// 等价于 "当地午夜 00:00:00" —— 命名上避免用 "midnight" 是因为跨夏令时
+/// 切换日,实际时钟时刻可能不是 00:00:00(例如跳过 1 小时)。
+///
+/// 用于 drift 查询中"今天内"区间的下界。
+DateTime startOfLocalDay([DateTime? source]) {
+  final d = source ?? DateTime.now();
+  return DateTime(d.year, d.month, d.day);
+}
+
+/// Returns the start of the local day after [source] (defaults to now).
+///
+/// 用作 drift 查询中"今天内"区间的上界 —— 与 [startOfLocalDay] 配对,
+/// `isBetweenValues(start, end)` 的 half-open 区间即可覆盖整个本地日历日。
+DateTime startOfNextLocalDay([DateTime? source]) {
+  final d = source ?? DateTime.now();
+  return DateTime(d.year, d.month, d.day + 1);
 }
 
 /// 将 UTC [DateTime] 渲染为相对时间描述。

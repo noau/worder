@@ -4,11 +4,7 @@ import 'dart:developer';
 import 'package:fsrs/fsrs.dart' as fsrs;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:worder/entity/llm_config.dart';
-
-DateTime _todayLocalMidnight() {
-  final n = DateTime.now();
-  return DateTime(n.year, n.month, n.day);
-}
+import 'package:worder/util/date_format.dart';
 
 class PreferencesRepository {
   static const String _llmConfigKey = "LLM_CONFIG";
@@ -42,7 +38,7 @@ class PreferencesRepository {
   Future<void> checkDaysLearnt() async {
     final daysLearnt = preferences.getInt(_daysLearntKey);
     final lastStr = preferences.getString(_lastLearntDayKey);
-    final today = _todayLocalMidnight();
+    final today = startOfLocalDay();
 
     if (lastStr != null) {
       final last = DateTime.parse(lastStr);

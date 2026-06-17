@@ -1,15 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
-// FIXME(review#8): 这个 _todayLocalMidnight 与 lib/database.dart:15 字节级
-// 重复。两份独立副本,任何时区/语义改动需同步两处。
-//
-// 修复方案:把 todayLocalMidnight() 暴露为 lib/util/date_format.dart 的 public
-// helper,database.dart 和 day_rollover_stream.dart 都改为 import 公共版本。
-DateTime _todayLocalMidnight() {
-  final n = DateTime.now();
-  return DateTime(n.year, n.month, n.day);
-}
+import 'package:worder/util/date_format.dart';
 
 class DayRolloverNotifier {
   final Stream<DateTime> stream;
@@ -26,17 +18,17 @@ DayRolloverNotifier dayRolloverNotifier({
 
   void pushCurrentDate() {
     if (!controller.isClosed) {
-      controller.add(_todayLocalMidnight());
+      controller.add(startOfLocalDay());
     }
   }
 
   controller = StreamController<DateTime>(
     onListen: () {
-      controller.add(_todayLocalMidnight());
+      controller.add(startOfLocalDay());
       // 使用 distinct() 过滤掉相同的日期
       sub = Stream<DateTime>.periodic(
         tick,
-        (_) => _todayLocalMidnight(),
+        (_) => startOfLocalDay(),
       ).distinct().listen(controller.add, onError: controller.addError);
     },
     onCancel: () async {

@@ -9,16 +9,9 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:worder/config.dart';
 import 'package:worder/entity/word_model.dart';
+import 'package:worder/util/date_format.dart';
 
 part 'database.g.dart';
-
-DateTime _todayLocalMidnight() {
-  final n = DateTime.now();
-  return DateTime(n.year, n.month, n.day);
-}
-
-DateTime _tomorrowLocalMidnight() =>
-    _todayLocalMidnight().add(Duration(days: 1));
 
 enum WordState {
   learning,
@@ -210,8 +203,8 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Stream<List<WordModel>> watchReviewedToday() {
-    final start = _todayLocalMidnight();
-    final end = _tomorrowLocalMidnight();
+    final start = startOfLocalDay();
+    final end = startOfNextLocalDay();
     return (select(wordRows)
           ..where((r) => r.lastReviewAt.isNotNull())
           ..where((r) => r.lastReviewAt.isBetweenValues(start, end))
@@ -221,8 +214,8 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Stream<int> watchReviewedTodayCount() {
-    final start = _todayLocalMidnight();
-    final end = _tomorrowLocalMidnight();
+    final start = startOfLocalDay();
+    final end = startOfNextLocalDay();
     final query = selectOnly(wordRows)
       ..addColumns([countAll()]) // 或者使用 wordRows.id.count() 确保精确
       ..where(wordRows.lastReviewAt.isNotNull())

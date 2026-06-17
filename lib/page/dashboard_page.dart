@@ -10,25 +10,11 @@ import 'package:worder/database.dart';
 import 'package:worder/entity/word_model.dart';
 import 'package:worder/repository.dart';
 import 'package:worder/routing.dart';
+import 'package:worder/util/date_format.dart';
 import 'package:worder/util/day_rollover_stream.dart';
 import 'package:worder/widget/dashboard_word_card.dart';
 
 const String _kSlogan = 'Every word, one step further.';
-
-// FIXME(review#8): 这个 _formatDate 与 lib/util/date_format.dart 的
-// formatAbsoluteDate 字节级重复。同时 lib/util/day_rollover_stream.dart
-// 的 _todayLocalMidnight 与 lib/database.dart:15 的同名私有 helper 也重复。
-// 两处都自承(date_format.dart 头注释 + dashboard_page.dart 的旧 TODO)。
-//
-// 修复方案:把 todayLocalMidnight() 和 formatAbsoluteDate() 都暴露为 public
-// util(放到 lib/util/date_format.dart),dashboard_page.dart 和
-// day_rollover_stream.dart 改成 import 公共版本,删除本地重复实现。
-String _formatDate(DateTime d) {
-  final l = d.toLocal();
-  final m = l.month.toString().padLeft(2, '0');
-  final day = l.day.toString().padLeft(2, '0');
-  return '${l.year}/$m/$day';
-}
 
 @RoutePage()
 class DashboardPage extends StatefulWidget {
@@ -218,7 +204,7 @@ class _DashboardPageState extends State<DashboardPage> {
           // 更新。无需 StreamBuilder(每天最多更新一次,StreamBuilder 是 overkill)。
           // BUG FIX (review#1): 之前的 StreamBuilder + initState `.listen()` 双订阅
           // 单订阅流导致首次 build 崩溃。已重构为本字段 + 单一 listener。
-          _Header(date: _formatDate(_currentDate), days: _daysLearnt),
+          _Header(date: formatAbsoluteDate(_currentDate), days: _daysLearnt),
           const SizedBox(height: 16),
           _StatsCard(
             expired: _expiredStream,
