@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:bot_toast/bot_toast.dart';
-import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +11,7 @@ import 'package:window_manager/window_manager.dart';
 import 'package:worder/database.dart';
 import 'package:worder/repository.dart';
 import 'package:worder/routing.dart';
+import 'package:worder/service/ai_service.dart';
 import 'package:worder/theme.dart';
 
 import 'config.dart';
@@ -33,25 +33,18 @@ void main() async {
     });
   }
 
-  OpenAI.requestsTimeOut = Duration(minutes: 10);
-  if (kDebugMode && debugLLMMode) {
-    OpenAI.showLogs = true;
-    OpenAI.showResponsesLogs = true;
-  } else {
-    OpenAI.showLogs = false;
-    OpenAI.showResponsesLogs = false;
-  }
-
   final savedThemeMode = await AdaptiveTheme.getThemeMode();
   final preferencesRepository = PreferencesRepository();
   final schedulerRepository = SchedulerRepository();
   final appDatabase = AppDatabase();
+  final aiService = AIService(preferencesRepository);
   runApp(
     WorderApp(
       savedThemeMode: savedThemeMode,
       preferencesRepository: preferencesRepository,
       schedulerRepository: schedulerRepository,
       appDatabase: appDatabase,
+      aiService: aiService,
     ),
   );
 }
@@ -63,12 +56,14 @@ class WorderApp extends StatelessWidget {
     required this.preferencesRepository,
     required this.schedulerRepository,
     required this.appDatabase,
+    required this.aiService,
   });
 
   final AdaptiveThemeMode? savedThemeMode;
   final PreferencesRepository preferencesRepository;
   final SchedulerRepository schedulerRepository;
   final AppDatabase appDatabase;
+  final AIService aiService;
   final appRouter = AppRouter();
 
   @override
@@ -81,6 +76,7 @@ class WorderApp extends StatelessWidget {
         Provider.value(value: preferencesRepository),
         Provider.value(value: schedulerRepository),
         Provider.value(value: appDatabase),
+        Provider.value(value: aiService),
       ],
       child: AdaptiveTheme(
         initial: savedThemeMode ?? AdaptiveThemeMode.system,

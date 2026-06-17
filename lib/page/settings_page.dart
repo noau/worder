@@ -5,8 +5,10 @@ import 'package:auto_route/annotations.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:worder/config.dart';
 import 'package:worder/entity/llm_config.dart';
 import 'package:worder/repository.dart';
+import 'package:worder/service/ai_service.dart';
 
 @RoutePage()
 class SettingsPage extends StatefulWidget {
@@ -18,9 +20,11 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   static const _saveErrorMessage = 'Failed to save settings';
-  static const _testNotImplementedMessage = 'Test not implemented yet';
+  static const _testSuccessMessage = 'Connection OK';
+  static const _testUnexpectedErrorMessage = 'Test failed: unexpected error';
 
   late final PreferencesRepository _repository;
+  late final AIService _aiService;
   late final TextEditingController _baseURLController;
   late final TextEditingController _apiKeyController;
   late final TextEditingController _modelController;
@@ -28,11 +32,14 @@ class _SettingsPageState extends State<SettingsPage> {
   late final FocusNode _apiKeyFocus;
   late final FocusNode _modelFocus;
   late final ValueNotifier<bool> _canTest;
+  Timer? _saveDebounce;
+  bool _isTesting = false;
 
   @override
   void initState() {
     super.initState();
     _repository = context.read<PreferencesRepository>();
+    _aiService = context.read<AIService>();
     final config = _repository.currentLLMConfig();
     _baseURLController = TextEditingController(text: config.baseURL);
     _apiKeyController = TextEditingController(text: config.apiKey);
@@ -41,9 +48,12 @@ class _SettingsPageState extends State<SettingsPage> {
     _apiKeyFocus = FocusNode()..addListener(() => _onFocusLost(_apiKeyFocus));
     _modelFocus = FocusNode()..addListener(() => _onFocusLost(_modelFocus));
     _canTest = ValueNotifier(_areAllFieldsFilled());
-    _baseURLController.addListener(_updateCanTest);
-    _apiKeyController.addListener(_updateCanTest);
-    _modelController.addListener(_updateCanTest);
+    // Single listener per controller: updates the Test-button enable
+    // state and arms the debounced save on every keystroke. Focus-loss
+    // and dispose saves remain as belt-and-braces.
+    _baseURLController.addListener(_onAnyFieldChanged);
+    _apiKeyController.addListener(_onAnyFieldChanged);
+    _modelController.addListener(_onAnyFieldChanged);
   }
 
   bool _areAllFieldsFilled() =>
@@ -51,12 +61,23 @@ class _SettingsPageState extends State<SettingsPage> {
       _apiKeyController.text.isNotEmpty &&
       _modelController.text.isNotEmpty;
 
-  void _updateCanTest() {
+  void _onAnyFieldChanged() {
     _canTest.value = _areAllFieldsFilled();
+    _saveDebounce?.cancel();
+    _saveDebounce = Timer(kSettingsSaveDebounce, () {
+      _saveDebounce = null;
+      unawaited(_saveConfig());
+    });
   }
 
   void _onFocusLost(FocusNode node) {
-    if (!node.hasFocus) unawaited(_saveConfig());
+    if (!node.hasFocus) {
+      // Cancel any pending debounced save so we don't write the same
+      // value twice when focus moves between fields.
+      _saveDebounce?.cancel();
+      _saveDebounce = null;
+      unawaited(_saveConfig());
+    }
   }
 
   Future<void> _saveConfig() async {
@@ -74,16 +95,40 @@ class _SettingsPageState extends State<SettingsPage> {
     try {
       await _repository.setLLMConfig(config: next);
     } catch (_) {
-      BotToast.showText(text: _saveErrorMessage);
+      _safeToast(_saveErrorMessage);
     }
   }
 
-  void _onTest() {
-    BotToast.showText(text: _testNotImplementedMessage);
+  void _safeToast(String text) {
+    if (!mounted) return;
+    BotToast.showText(text: text);
+  }
+
+  Future<void> _onTest() async {
+    if (_isTesting) return;
+    // Flip the spinner on before the async save so the button reflects
+    // the in-flight state even on a slow first SharedPreferences write.
+    setState(() => _isTesting = true);
+    // Flush any pending debounced save so the Test call sees the latest
+    // values from SharedPreferences, not the controller buffer.
+    _saveDebounce?.cancel();
+    _saveDebounce = null;
+    await _saveConfig();
+    try {
+      await _aiService.testConnection();
+      _safeToast(_testSuccessMessage);
+    } on LLMException catch (e) {
+      _safeToast(e.message);
+    } catch (_) {
+      _safeToast(_testUnexpectedErrorMessage);
+    } finally {
+      if (mounted) setState(() => _isTesting = false);
+    }
   }
 
   @override
   void dispose() {
+    _saveDebounce?.cancel();
     unawaited(_saveConfig());
     _baseURLController.dispose();
     _apiKeyController.dispose();
@@ -185,8 +230,16 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: ValueListenableBuilder<bool>(
                       valueListenable: _canTest,
                       builder: (_, canTest, _) => FilledButton.tonal(
-                        onPressed: canTest ? _onTest : null,
-                        child: const Text('Test'),
+                        onPressed: canTest && !_isTesting ? _onTest : null,
+                        child: _isTesting
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text('Test'),
                       ),
                     ),
                   ),
