@@ -5,8 +5,15 @@ import 'package:fsrs/fsrs.dart' as fsrs;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:worder/entity/llm_config.dart';
 
+DateTime _todayLocalMidnight() {
+  final n = DateTime.now();
+  return DateTime(n.year, n.month, n.day);
+}
+
 class PreferencesRepository {
   static const String _llmConfigKey = "LLM_CONFIG";
+  static const String _daysLearntKey = "DAYS_LEARNT";
+  static const String _lastLearntDayKey = "LAST_LEARNT_DAY";
 
   // TODO: 后续在 Settings UI 加设置项并持久化到 SharedPreferences,
   //       getter 改为读 preferences.getInt(_batchSizeKey) 并暴露 setter。
@@ -30,6 +37,28 @@ class PreferencesRepository {
 
   Future<void> setLLMConfig({required LLMConfig config}) async {
     await preferences.setString(_llmConfigKey, jsonEncode(config.toJson()));
+  }
+
+  Future<void> checkDaysLearnt() async {
+    final daysLearnt = preferences.getInt(_daysLearntKey);
+    final lastStr = preferences.getString(_lastLearntDayKey);
+    final today = _todayLocalMidnight();
+
+    if (lastStr != null) {
+      final last = DateTime.parse(lastStr);
+      assert(daysLearnt != null);
+      if (today.isAfter(last)) {
+        await preferences.setString(_lastLearntDayKey, today.toIso8601String());
+        await preferences.setInt(_daysLearntKey, daysLearnt! + 1);
+      }
+    } else {
+      await preferences.setString(_lastLearntDayKey, today.toIso8601String());
+      await preferences.setInt(_daysLearntKey, 1);
+    }
+  }
+
+  int daysLearnt() {
+    return preferences.getInt(_daysLearntKey) ?? 1;
   }
 
   int get reviewBatchSize => _defaultReviewBatchSize;

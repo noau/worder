@@ -15,9 +15,6 @@ import 'package:worder/widget/dashboard_word_card.dart';
 
 const String _kSlogan = 'Every word, one step further.';
 
-// TODO: 真实首启日期或 Settings 选项
-const int _kDaysUsingApp = 7;
-
 // FIXME(review#8): 这个 _formatDate 与 lib/util/date_format.dart 的
 // formatAbsoluteDate 字节级重复。同时 lib/util/day_rollover_stream.dart
 // 的 _todayLocalMidnight 与 lib/database.dart:15 的同名私有 helper 也重复。
@@ -53,6 +50,7 @@ class _DashboardPageState extends State<DashboardPage> {
   late Stream<List<WordModel>> _expiredStream;
   late Stream<List<WordModel>> _reviewedTodayStream;
   late Stream<List<WordModel>> _recentStream;
+  late int _daysLearnt;
 
   // 当前 local date。DayRolloverNotifier 只在跨过 midnight 时发一次,
   // 用 setState 驱动的字段即可,不需要 StreamBuilder。
@@ -76,13 +74,14 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
+    _daysLearnt = context.read<PreferencesRepository>().daysLearnt();
     _db = context.read<AppDatabase>();
     _expiredStream = _db.watchExpiredWords();
     _reviewedTodayStream = _db.watchReviewedToday();
     _recentStream = _db.watchRecentlyReviewed();
     _rolloverNotifier = dayRolloverNotifier();
     _rolloverSubscription = _rolloverNotifier.stream.listen(
-      _refreshStreamOnDateRollover,
+      _refreshOnDateRollover,
     );
     // FIXME(review#7): AppLifecycleListener.onResume 只在 OS 派发窗口生命周期
     // 事件(激活、最小化恢复)时触发。Windows 在前台聚焦状态下穿过午夜不会
@@ -103,13 +102,16 @@ class _DashboardPageState extends State<DashboardPage> {
     super.dispose();
   }
 
-  void _refreshStreamOnDateRollover(DateTime date) {
+  Future<void> _refreshOnDateRollover(DateTime date) async {
+    final prefs = context.read<PreferencesRepository>();
+    await prefs.checkDaysLearnt();
     if (!mounted) return;
     setState(() {
       _currentDate = date;
       _expiredStream = _db.watchExpiredWords();
       _reviewedTodayStream = _db.watchReviewedToday();
       _recentStream = _db.watchRecentlyReviewed();
+      _daysLearnt = prefs.daysLearnt();
     });
   }
 
@@ -216,10 +218,7 @@ class _DashboardPageState extends State<DashboardPage> {
           // 更新。无需 StreamBuilder(每天最多更新一次,StreamBuilder 是 overkill)。
           // BUG FIX (review#1): 之前的 StreamBuilder + initState `.listen()` 双订阅
           // 单订阅流导致首次 build 崩溃。已重构为本字段 + 单一 listener。
-          _Header(
-            date: _formatDate(_currentDate),
-            days: _kDaysUsingApp,
-          ),
+          _Header(date: _formatDate(_currentDate), days: _daysLearnt),
           const SizedBox(height: 16),
           _StatsCard(
             expired: _expiredStream,

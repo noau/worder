@@ -31,6 +31,7 @@ class SplashPage extends StatelessWidget {
 
         log("Initializing PreferencesRepository...");
         await preferencesRepository.init();
+        await preferencesRepository.checkDaysLearnt();
         log("Initializing SchedulerRepository...");
         await schedulerRepository.init();
 
