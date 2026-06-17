@@ -1,8 +1,11 @@
 // UI Debugs
+import 'package:logging/logging.dart';
+
 const bool disableDebugLabel = false;
 
 //AI Debugs
-const bool debugLLMMode = false;
+const bool debugLLMMode = true;
+const Level debugLLMLogLevel = Level.ALL;
 
 /// Upper bound for any single LLM HTTP request (chat completion, etc).
 /// Long enough for slow local endpoints, short enough to fail visibly

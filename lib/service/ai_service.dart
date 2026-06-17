@@ -2,10 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
-// `Level` is referenced solely as a type for `openai_dart`'s `logLevel`
-// knob (only set when `debugLLMMode` is on). Project-level diagnostics
-// still use `dart:developer`'s `log(...)`.
-import 'package:logging/logging.dart';
 import 'package:openai_dart/openai_dart.dart';
 
 import '../config.dart';
@@ -16,10 +12,12 @@ import '../repository.dart';
 /// [LLMConfig] from [PreferencesRepository] on every call, so the latest
 /// user-edited values are always used.
 ///
-/// Designed to be the single point of contact for all AI features. Right
-/// now it exposes only [testConnection] (used by the Settings page Test
-/// button). The AddWordPage "AI Enhance" hook is a future addition — see
-/// CLAUDE.md "AI Enhance behavior (deferred)".
+/// Public API:
+///   * [isConfigured]   — cheap config-present check.
+///   * [testConnection] — used by the Settings "Test" button.
+///   * [chatCompletion] — generic transport used by feature-specific
+///                        managers (e.g. [AIEnhancer] for the AddWordPage
+///                        "AI Enhance" button).
 class AIService {
   AIService(this._prefs);
 
@@ -30,6 +28,13 @@ class AIService {
   /// notifications.
   LLMConfig get _config => _prefs.currentLLMConfig();
 
+  /// True iff [baseURL], [modelName], and [apiKey] are all non-empty.
+  ///
+  /// Cheap: just reads from in-memory prefs. Safe to call on every build.
+  /// Used by the AddWordPage "AI Enhance" button to decide whether to
+  /// enable itself.
+  bool get isConfigured => !_config.isEmpty;
+
   OpenAIClient _buildClient(LLMConfig config) {
     return OpenAIClient(
       config: OpenAIConfig(
@@ -39,7 +44,7 @@ class AIService {
         // Test/Enhance calls should fail fast on a bad config rather
         // than burning 3 retries on a misconfigured baseURL.
         retryPolicy: const RetryPolicy(maxRetries: 0),
-        logLevel: kDebugMode && debugLLMMode ? Level.FINE : null,
+        logLevel: kDebugMode && debugLLMMode ? debugLLMLogLevel : null,
       ),
     );
   }
@@ -49,10 +54,10 @@ class AIService {
   /// typed `openai_dart` exceptions into a user-facing [LLMException],
   /// and always closes the client.
   ///
-  /// Domain methods (currently [testConnection]; future `enhanceWord`,
-  /// etc.) are expected to be a thin one-liner that picks the chat
-  /// request shape and any result-parsing — they should not re-implement
-  /// the config / client / error-handling policy.
+  /// Domain methods ([testConnection], [chatCompletion]) are a thin
+  /// one-liner that picks the chat request shape and any result-parsing —
+  /// they should not re-implement the config / client / error-handling
+  /// policy.
   Future<T> _execute<T>({
     required String methodName,
     required Future<T> Function(OpenAIClient client, LLMConfig config) body,
@@ -125,10 +130,51 @@ class AIService {
       );
     },
   );
+
+  /// Send a chat completion and return the raw assistant text.
+  ///
+  /// Goes through [_execute] for config gating + exception translation.
+  /// The transport itself does not interpret the result; callers
+  /// (e.g. [AIEnhancer]) own the prompt contract and response parsing.
+  ///
+  /// * [temperature] default `0.4` balances creativity with format
+  ///   adherence. Set higher for more variance, lower for stricter output.
+  /// * [maxTokens] optional upper bound. `null` means "model default".
+  ///   Both `maxTokens` and `maxCompletionTokens` are set to the same
+  ///   value to be robust across vendors that accept only one form.
+  /// * [abortTrigger] when its future completes, the underlying HTTP
+  ///   call is cancelled via `openai_dart`'s `abortTrigger` argument.
+  ///   The transport does not interpret the cancellation; callers must
+  ///   inspect their own state (e.g. [AIEnhancer] checks the abort
+  ///   completer to distinguish "user-cancelled" from "real error").
+  Future<String> chatCompletion({
+    required List<ChatMessage> messages,
+    double temperature = 0.4,
+    int? maxTokens,
+    Future<void>? abortTrigger,
+  }) {
+    return _execute<String>(
+      methodName: 'chatCompletion',
+      body: (client, config) async {
+        final res = await client.chat.completions.create(
+          ChatCompletionCreateRequest(
+            model: config.modelName,
+            messages: messages,
+            temperature: temperature,
+            maxTokens: maxTokens,
+            maxCompletionTokens: maxTokens,
+          ),
+          abortTrigger: abortTrigger,
+        );
+        return res.choices.first.message.content ?? '';
+      },
+    );
+  }
 }
 
 /// User-facing AI error. `message` is short and ready for a BotToast.
 class LLMException implements Exception {
   const LLMException(this.message);
+
   final String message;
 }
