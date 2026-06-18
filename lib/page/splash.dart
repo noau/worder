@@ -1,6 +1,10 @@
+import 'dart:developer';
+
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:worder/repository.dart';
 import 'package:worder/routing.dart';
 
 @RoutePage()
@@ -14,6 +18,10 @@ class SplashPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 8,
         children: [
+          // "Worder" is intentionally hardcoded here: the splash renders
+          // BEFORE MaterialApp is mounted, so AppLocalizations.of(context)
+          // would throw. Tradeoff accepted for 0.1.0 — the splash is shown
+          // for 3s on first launch and the brand is identical across locales.
           Text("Worder", style: Theme.of(context).textTheme.displayLarge),
           SizedBox(height: 48),
         ],
@@ -22,6 +30,15 @@ class SplashPage extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       asyncNavigationCallback: () async {
         // Initializations
+        final preferencesRepository = context.read<PreferencesRepository>();
+        final schedulerRepository = context.read<SchedulerRepository>();
+
+        log("Initializing PreferencesRepository...");
+        await preferencesRepository.init();
+        await preferencesRepository.checkDaysLearnt();
+        log("Initializing SchedulerRepository...");
+        await schedulerRepository.init();
+
         await Future.delayed(const Duration(seconds: 3));
       },
       onEnd: () async {

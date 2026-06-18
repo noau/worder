@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Localized Android launcher label for zh-Hant-TW (Traditional Chinese,
+      Taiwan). Resolved by Android when the system language is one of:
+      zh-TW, zh-Hant-TW, or any zh-Hant variant.
+    -->
+    <string name="app_name">綴字</string>
+</resources>

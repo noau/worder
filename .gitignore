@@ -43,3 +43,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/CLAUDE.md
+/.claude/settings.local.json
+/tostore-README.md
+/fsrs-README.md
+/skeletonizer-README.md
+/animated_switcher_plus-README.md
+/dart_openai-README.md
