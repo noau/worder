@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:openai_dart/openai_dart.dart';
 
 import '../constant/ai_prompts.dart';
 import '../service/ai_service.dart';
+import '../util/locale_prompts.dart';
 import 'enhance_field.dart';
 
 /// The structured response from a single AI Enhance call.
@@ -63,11 +65,34 @@ class EnhanceSuccess extends EnhanceState {
   final EnhanceResult result;
 }
 
+/// Why the last chat completion failed. The sheet resolves the user-facing
+/// string at render time via [LlmErrorLocalizer.localizeEnhanceError], so
+/// the model layer stays locale-agnostic and unit-testable.
+enum EnhanceErrorKind {
+  /// LLM returned a string that did not match the expected pinyin/meaning/
+  /// note structure.
+  unexpectedFormat,
+
+  /// An [LLMException] was caught. The original exception is carried in
+  /// [EnhanceError.cause] so the UI can re-delegate to
+  /// [LlmErrorLocalizer.localizeLLMException].
+  llmException,
+
+  /// Anything else (library bug, network glitch not caught by AIService, …).
+  unknown,
+}
+
 /// A chat completion failed (network, auth, parse, etc.) and the user
-/// should be shown [message] with a path forward (retry or close).
+/// should be shown the localized error with a path forward (retry or close).
 class EnhanceError extends EnhanceState {
-  const EnhanceError(this.message);
-  final String message;
+  const EnhanceError(this.kind, {this.cause});
+
+  final EnhanceErrorKind kind;
+
+  /// The original exception, if any. Useful for [EnhanceErrorKind.llmException]
+  /// (carry the [LLMException] so the UI can pull [LLMErrorKind] and
+  /// [LLMException.params]) and [EnhanceErrorKind.unknown] (debug logging).
+  final Object? cause;
 }
 
 /// Stateful wrapper around the AI Enhance feature.
@@ -86,9 +111,19 @@ class EnhanceError extends EnhanceState {
 /// [regenerate] / [start] call while one is running first aborts the
 /// in-flight call and waits for its future to settle before proceeding.
 class AIEnhancer {
-  AIEnhancer({required AIService aiService}) : _aiService = aiService;
+  AIEnhancer({
+    required AIService aiService,
+    required Locale outputLocale,
+  })  : _aiService = aiService,
+       _outputLocale = outputLocale;
 
   final AIService _aiService;
+
+  /// Locale the meaning / note text should be written in. Resolved to a
+  /// human-readable name via [languageNameForPrompt] at the point the
+  /// system prompt is built; the system prompt is rebuilt on every
+  /// [start] call so a locale change is picked up on the next session.
+  final Locale _outputLocale;
 
   final ValueNotifier<EnhanceState> _state =
       ValueNotifier<EnhanceState>(const EnhanceInitial());
@@ -133,7 +168,11 @@ class AIEnhancer {
 
     _history
       ..clear()
-      ..add(ChatMessage.system(kEnhanceSystemPrompt));
+      ..add(
+        ChatMessage.system(
+          kEnhanceSystemPrompt(languageNameForPrompt(_outputLocale)),
+        ),
+      );
 
     await _sendUserMessage(
       _buildInitialUserPrompt(
@@ -257,13 +296,11 @@ class AIEnhancer {
       if (myAbort.isCompleted) {
         _setState(const EnhanceInitial());
       } else if (e is LLMException) {
-        _setState(EnhanceError(e.message));
+        _setState(EnhanceError(EnhanceErrorKind.llmException, cause: e));
       } else if (e is FormatException) {
-        _setState(const EnhanceError(
-          'AI returned an unexpected format. Try again.',
-        ));
+        _setState(const EnhanceError(EnhanceErrorKind.unexpectedFormat));
       } else {
-        _setState(EnhanceError('AI error: $e'));
+        _setState(EnhanceError(EnhanceErrorKind.unknown, cause: e));
       }
     } finally {
       // Only clear if THIS call still owns the slot — a newer call may

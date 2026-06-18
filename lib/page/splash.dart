@@ -18,6 +18,10 @@ class SplashPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 8,
         children: [
+          // "Worder" is intentionally hardcoded here: the splash renders
+          // BEFORE MaterialApp is mounted, so AppLocalizations.of(context)
+          // would throw. Tradeoff accepted for 0.1.0 — the splash is shown
+          // for 3s on first launch and the brand is identical across locales.
           Text("Worder", style: Theme.of(context).textTheme.displayLarge),
           SizedBox(height: 48),
         ],

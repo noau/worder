@@ -5,15 +5,18 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart' as logging;
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:worder/database.dart';
+import 'package:worder/l10n/app_localizations.dart';
 import 'package:worder/repository.dart';
 import 'package:worder/routing.dart';
 import 'package:worder/service/ai_service.dart';
 import 'package:worder/theme.dart';
+import 'package:worder/util/context_l10n.dart';
 
 import 'config.dart';
 
@@ -27,7 +30,7 @@ void main() async {
     WindowOptions windowOptions = WindowOptions(
       size: Size(400, 800),
       minimumSize: Size(400, 600),
-      title: "What If?",
+      title: "Worder",
       center: true,
     );
     windowManager.waitUntilReadyToShow(windowOptions, () async {
@@ -87,9 +90,34 @@ class WorderApp extends StatelessWidget {
         dark: theme.dark(),
         builder: (lightTheme, darkTheme) => MaterialApp.router(
           debugShowCheckedModeBanner: !(kDebugMode && disableDebugLabel),
-          title: 'Worder',
+          onGenerateTitle: (context) => context.l10n.appTitle,
           theme: lightTheme,
           darkTheme: darkTheme,
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'),
+            // 英文（兜底）
+            Locale.fromSubtags(
+              languageCode: 'zh',
+              scriptCode: 'Hans',
+              countryCode: 'CN',
+            ),
+            Locale.fromSubtags(
+              languageCode: 'zh',
+              scriptCode: 'Hant',
+              countryCode: 'TW',
+            ),
+            Locale.fromSubtags(
+              languageCode: 'zh',
+              scriptCode: 'Hant',
+              countryCode: 'HK',
+            ),
+          ],
           scrollBehavior: BothScrollBehavior(),
           routerConfig: appRouter.config(
             navigatorObservers: () => [BotToastNavigatorObserver()],

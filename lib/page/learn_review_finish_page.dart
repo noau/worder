@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:worder/routing.dart';
+import 'package:worder/util/context_l10n.dart';
 
 /// Placeholder for the end-of-session summary.
 ///
@@ -43,13 +44,13 @@ class LearnReviewFinishPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Session complete!',
+                    context.l10n.sessionCompleteTitle,
                     style: theme.textTheme.headlineSmall,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '$reviewedCount ${reviewedCount == 1 ? "word" : "words"} reviewed.',
+                    context.l10n.sessionCompleteCounter(reviewedCount),
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: colors.onSurfaceVariant,
                     ),
@@ -60,7 +61,7 @@ class LearnReviewFinishPage extends StatelessWidget {
                     onPressed: () =>
                         context.router.replaceAll([const HomeRoute()]),
                     icon: const Icon(Icons.home_outlined),
-                    label: const Text('Back to Dashboard'),
+                    label: Text(context.l10n.sessionCompleteBack),
                   ),
                 ],
               ),

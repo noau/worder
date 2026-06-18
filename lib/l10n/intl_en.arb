@@ -1,0 +1,555 @@
+{
+  "@@locale": "en",
+  "appTitle": "Worder",
+  "@appTitle": {
+    "description": "Application display name shown in the title bar, the Android launcher (via strings.xml), and system task switchers."
+  },
+  "appSlogan": "Every word, one step further.",
+  "@appSlogan": {
+    "description": "Short motivational tagline used as the default app slogan in marketing and about screens."
+  },
+  "navDashboard": "Dashboard",
+  "@navDashboard": {
+    "description": "Bottom NavigationBar tab label for the dashboard (home) screen."
+  },
+  "navLibrary": "Library",
+  "@navLibrary": {
+    "description": "Bottom NavigationBar tab label for the word library screen."
+  },
+  "navSettings": "Settings",
+  "@navSettings": {
+    "description": "Bottom NavigationBar tab label for the settings screen."
+  },
+  "navNewWordTooltip": "New Word",
+  "@navNewWordTooltip": {
+    "description": "FloatingActionButton tooltip on the dashboard and library tabs. Tapping opens the Add Word page."
+  },
+  "dashboardSlogan": "Every word, one step further.",
+  "@dashboardSlogan": {
+    "description": "Dashboard header tagline displayed under the Worder brand title."
+  },
+  "dashboardDayCounter": "{days, plural, =0{Day 0} =1{Day 1} other{Day {days}}}",
+  "@dashboardDayCounter": {
+    "description": "Streak counter shown under the dashboard date. Shows the number of consecutive days the user has opened the app. Uses ICU plural so translators can customise the form for 0/1/other counts.",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "dashboardStatNeedToReview": "Need to Review",
+  "@dashboardStatNeedToReview": {
+    "description": "Label of the left status card on the dashboard. Shows the count of words currently due for FSRS review."
+  },
+  "dashboardStatReviewedToday": "Reviewed Today",
+  "@dashboardStatReviewedToday": {
+    "description": "Label of the right status card on the dashboard. Shows how many words the user has reviewed since local midnight."
+  },
+  "dashboardReviewButton": "Review",
+  "@dashboardReviewButton": {
+    "description": "Primary button on the dashboard that starts an FSRS review session for due words."
+  },
+  "dashboardLearnButton": "Learn",
+  "@dashboardLearnButton": {
+    "description": "Primary button on the dashboard that starts a learn session for new (or relearning) words."
+  },
+  "dashboardRecentlyReviewed": "Recently reviewed",
+  "@dashboardRecentlyReviewed": {
+    "description": "Section header above the list of the most recently reviewed words on the dashboard."
+  },
+  "dashboardErrorCouldNotLoadReviewStatus": "Could not load review status",
+  "@dashboardErrorCouldNotLoadReviewStatus": {
+    "description": "Toast message shown when the dashboard fails to load the count of words due for review (typically before opening the Learn dialog)."
+  },
+  "dashboardErrorCouldNotLoadLearningWords": "Could not load learning words",
+  "@dashboardErrorCouldNotLoadLearningWords": {
+    "description": "Toast message shown when the Learn button fails to load the batch of new words."
+  },
+  "dashboardErrorCouldNotLoadReviewWords": "Could not load review words",
+  "@dashboardErrorCouldNotLoadReviewWords": {
+    "description": "Toast message shown when the Review button fails to load the batch of due words."
+  },
+  "dashboardErrorCouldNotLoadRecentReviews": "Could not load recent reviews.",
+  "@dashboardErrorCouldNotLoadRecentReviews": {
+    "description": "Inline error message inside the 'Recently reviewed' section when its stream emits an error."
+  },
+  "dashboardEmptyNoReviewedYet": "No reviewed words yet.",
+  "@dashboardEmptyNoReviewedYet": {
+    "description": "Inline empty-state message for the 'Recently reviewed' section when the user has not reviewed any words yet."
+  },
+  "dashboardDialogReviewFirstTitle": "Review work waiting",
+  "@dashboardDialogReviewFirstTitle": {
+    "description": "Title of the dialog shown when the user taps Learn while there are still words due for review. Encourages reviewing first."
+  },
+  "dashboardDialogReviewFirstMessage": "{dueCount} {dueCount, plural, =1{word is} other{words are}} due for review. Review them first, or continue with learning?",
+  "@dashboardDialogReviewFirstMessage": {
+    "description": "Body of the 'Review work waiting' dialog. Uses ICU plural to choose 'word'/'words' and 'is'/'are' based on the number of due reviews.",
+    "placeholders": {
+      "dueCount": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "dashboardDialogReviewFirstOk": "Review",
+  "@dashboardDialogReviewFirstOk": {
+    "description": "OK button label of the 'Review work waiting' dialog. Switches to a review session."
+  },
+  "dashboardDialogReviewFirstCancel": "Continue learning",
+  "@dashboardDialogReviewFirstCancel": {
+    "description": "Cancel button label of the 'Review work waiting' dialog. Proceeds with the original Learn session."
+  },
+  "dashboardDialogNoNewWordsTitle": "No new words yet",
+  "@dashboardDialogNoNewWordsTitle": {
+    "description": "Title of the dialog shown when the user taps Learn but no new or relearning words are available."
+  },
+  "dashboardDialogNoNewWordsMessage": "You have no new words to learn right now. Try to add some new words!",
+  "@dashboardDialogNoNewWordsMessage": {
+    "description": "Body of the 'No new words yet' dialog, encouraging the user to add new words."
+  },
+  "dashboardDialogAllCaughtUpTitle": "All caught up!",
+  "@dashboardDialogAllCaughtUpTitle": {
+    "description": "Title of the dialog shown when the user taps Review but no words are due. Celebratory tone."
+  },
+  "dashboardDialogAllCaughtUpMessage": "You have no words due for review right now. Try to learn some new words!",
+  "@dashboardDialogAllCaughtUpMessage": {
+    "description": "Body of the 'All caught up!' dialog, nudging the user to add new words."
+  },
+  "addWordAppBarTitle": "New Word",
+  "@addWordAppBarTitle": {
+    "description": "AppBar title of the Add Word full-screen page."
+  },
+  "addWordFieldWord": "Word",
+  "@addWordFieldWord": {
+    "description": "Label for the word input field on the Add Word form. Reused in the AI Enhance sheet for the same field."
+  },
+  "addWordFieldPinyin": "Pinyin",
+  "@addWordFieldPinyin": {
+    "description": "Label for the pinyin input field on the Add Word form. Reused in the AI Enhance sheet for the same field."
+  },
+  "addWordFieldMeaning": "Meaning",
+  "@addWordFieldMeaning": {
+    "description": "Label for the meaning/definition input field on the Add Word form. Reused in the AI Enhance sheet for the same field."
+  },
+  "addWordFieldNote": "Note (optional)",
+  "@addWordFieldNote": {
+    "description": "Label for the optional notes input field on the Add Word form. The '(optional)' suffix signals the field is not required."
+  },
+  "addWordAiEnhanceButton": "AI Enhance",
+  "@addWordAiEnhanceButton": {
+    "description": "Outlined button on the Add Word bottom bar that opens the AI Enhance sheet to auto-fill pinyin, meaning, and notes."
+  },
+  "addWordConfirmButton": "Confirm",
+  "@addWordConfirmButton": {
+    "description": "Primary filled button on the Add Word bottom bar. Opens a save confirmation dialog before persisting the new word."
+  },
+  "addWordSaveDialogTitle": "Save this word?",
+  "@addWordSaveDialogTitle": {
+    "description": "Title of the save confirmation dialog on the Add Word page."
+  },
+  "addWordSaveDialogMessage": "A new word entry will be created.",
+  "@addWordSaveDialogMessage": {
+    "description": "Body of the save confirmation dialog on the Add Word page."
+  },
+  "addWordSaveDialogOk": "Save",
+  "@addWordSaveDialogOk": {
+    "description": "OK button label of the save confirmation dialog on the Add Word page."
+  },
+  "addWordSaveDialogCancel": "Cancel",
+  "@addWordSaveDialogCancel": {
+    "description": "Cancel button label of the save confirmation dialog on the Add Word page."
+  },
+  "addWordToastSaveSuccess": "Saved",
+  "@addWordToastSaveSuccess": {
+    "description": "Toast message shown after a new word is persisted successfully. The form is then cleared for batch entry."
+  },
+  "addWordToastSaveError": "Failed to save the word",
+  "@addWordToastSaveError": {
+    "description": "Toast message shown when persisting a new word fails. The form is left intact for retry."
+  },
+  "addWordEnhanceLoading": "Asking the AI to enhance your word…",
+  "@addWordEnhanceLoading": {
+    "description": "Loading text shown inside the AI Enhance sheet while waiting for the LLM to return pinyin/meaning/notes."
+  },
+  "addWordEnhanceErrorClose": "Close",
+  "@addWordEnhanceErrorClose": {
+    "description": "Button label in the AI Enhance sheet's error state. Dismisses the sheet."
+  },
+  "addWordEnhanceRegenerateTooltip": "Re-generate",
+  "@addWordEnhanceRegenerateTooltip": {
+    "description": "IconButton tooltip in the AI Enhance sheet. Re-asks the LLM for that single field (pinyin, meaning, or note)."
+  },
+  "addWordEnhanceRestoreTooltip": "Restore original",
+  "@addWordEnhanceRestoreTooltip": {
+    "description": "IconButton tooltip in the AI Enhance sheet. Reverts that field to whatever the user typed before the LLM filled it in."
+  },
+  "addWordEnhanceRegenerateAll": "Re-generate all",
+  "@addWordEnhanceRegenerateAll": {
+    "description": "Outlined button label in the AI Enhance sheet. Re-asks the LLM for pinyin, meaning, and notes in one go."
+  },
+  "addWordEnhanceCancel": "Cancel",
+  "@addWordEnhanceCancel": {
+    "description": "Outlined button label in the AI Enhance sheet. Discards AI suggestions and closes the sheet."
+  },
+  "addWordEnhanceConfirm": "Confirm",
+  "@addWordEnhanceConfirm": {
+    "description": "Primary button label in the AI Enhance sheet. Copies the AI-suggested pinyin/meaning/note back into the Add Word form."
+  },
+  "libraryToastDeleteSuccess": "Deleted",
+  "@libraryToastDeleteSuccess": {
+    "description": "Toast message shown after a word is successfully deleted from the library."
+  },
+  "libraryToastDeleteError": "Failed to delete the word",
+  "@libraryToastDeleteError": {
+    "description": "Toast message shown when deleting a word from the library fails."
+  },
+  "libraryDialogDeleteTitle": "Delete this word?",
+  "@libraryDialogDeleteTitle": {
+    "description": "Title of the long-press delete confirmation dialog on the library page."
+  },
+  "libraryDialogDeleteMessage": "\"{word}\" will be removed from your library. This cannot be undone.",
+  "@libraryDialogDeleteMessage": {
+    "description": "Body of the delete confirmation dialog. Includes the word's text in double quotes and warns the action is irreversible.",
+    "placeholders": {
+      "word": {
+        "type": "String",
+        "example": "serendipity"
+      }
+    }
+  },
+  "libraryDialogDeleteOk": "Delete",
+  "@libraryDialogDeleteOk": {
+    "description": "OK button label of the library delete confirmation dialog."
+  },
+  "libraryDialogDeleteCancel": "Cancel",
+  "@libraryDialogDeleteCancel": {
+    "description": "Cancel button label of the library delete confirmation dialog."
+  },
+  "libraryErrorLoadTitle": "Couldn't load your library",
+  "@libraryErrorLoadTitle": {
+    "description": "Heading of the error state on the library page when the words stream fails."
+  },
+  "libraryErrorRetry": "Retry",
+  "@libraryErrorRetry": {
+    "description": "Button label in the library error state. Re-subscribes to the words stream."
+  },
+  "libraryEmptyTitle": "Library is empty",
+  "@libraryEmptyTitle": {
+    "description": "Heading of the empty state on the library page when the user has no words saved yet."
+  },
+  "libraryEmptyMessage": "Add your first word to start building your collection",
+  "@libraryEmptyMessage": {
+    "description": "Subtext of the library empty state, encouraging the user to add their first word."
+  },
+  "libraryEmptyAddButton": "Add Word",
+  "@libraryEmptyAddButton": {
+    "description": "Primary button label in the library empty state. Navigates to the Add Word page."
+  },
+  "libraryActionsDelete": "Delete",
+  "@libraryActionsDelete": {
+    "description": "Title of the destructive 'Delete' ListTile in the per-card actions bottom sheet on the library page. Separate key from the dialog confirm button so the sheet can be styled as destructive without forcing the dialog button to be styled the same way."
+  },
+  "settingsSectionTheme": "Theme",
+  "@settingsSectionTheme": {
+    "description": "Section heading on the settings page that groups the theme SegmentedButton."
+  },
+  "settingsThemeLight": "Light",
+  "@settingsThemeLight": {
+    "description": "Segment label that forces the light theme."
+  },
+  "settingsThemeDark": "Dark",
+  "@settingsThemeDark": {
+    "description": "Segment label that forces the dark theme."
+  },
+  "settingsThemeSystem": "System",
+  "@settingsThemeSystem": {
+    "description": "Segment label that follows the OS theme preference."
+  },
+  "settingsSectionAiConfig": "AI Configuration",
+  "@settingsSectionAiConfig": {
+    "description": "Section heading on the settings page that groups the LLM config fields (base URL, API key, model)."
+  },
+  "settingsAiConfigDescription": "Only OpenAI-compatible APIs are supported.",
+  "@settingsAiConfigDescription": {
+    "description": "Subtitle below the AI Configuration section heading, clarifying that only OpenAI-compatible LLM endpoints are valid."
+  },
+  "settingsFieldBaseUrl": "Base URL",
+  "@settingsFieldBaseUrl": {
+    "description": "Label for the Base URL input field in AI Configuration. Typically an OpenAI-compatible endpoint root (e.g. https://api.openai.com/v1)."
+  },
+  "settingsFieldApiKey": "API Key",
+  "@settingsFieldApiKey": {
+    "description": "Label for the API key input field in AI Configuration. The field is rendered as a password (obscured)."
+  },
+  "settingsFieldApiKeyHelper": "Hidden for privacy",
+  "@settingsFieldApiKeyHelper": {
+    "description": "Helper text under the API key field, reassuring the user that the key is obscured in the UI."
+  },
+  "settingsFieldModel": "Model",
+  "@settingsFieldModel": {
+    "description": "Label for the model name input field in AI Configuration (e.g. gpt-4o-mini, qwen2.5:7b)."
+  },
+  "settingsTestButton": "Test",
+  "@settingsTestButton": {
+    "description": "Label of the FilledButton that fires AIService.testConnection() and toasts the result."
+  },
+  "settingsToastSaveError": "Failed to save settings",
+  "@settingsToastSaveError": {
+    "description": "Toast message shown when persisting the LLM config (debounced auto-save) fails."
+  },
+  "settingsToastTestSuccess": "Connection OK",
+  "@settingsToastTestSuccess": {
+    "description": "Toast message shown after AIService.testConnection() succeeds."
+  },
+  "settingsToastTestUnexpectedError": "Test failed: unexpected error",
+  "@settingsToastTestUnexpectedError": {
+    "description": "Toast message shown when AIService.testConnection() throws something that is not an LLMException."
+  },
+  "learnHeaderProgressCounter": "{reviewed} / {total}",
+  "@learnHeaderProgressCounter": {
+    "description": "Small header text on the Learn / Review session page showing how many of the session's words have been rated.",
+    "placeholders": {
+      "reviewed": {
+        "type": "int",
+        "example": "3"
+      },
+      "total": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  "learnBackTooltip": "Quit session",
+  "@learnBackTooltip": {
+    "description": "Tooltip of the back-arrow IconButton in the Learn / Review session AppBar. Opens a quit-confirmation dialog."
+  },
+  "learnRevealButton": "Reveal",
+  "@learnRevealButton": {
+    "description": "Label of the front-of-card button that flips the card to show pinyin/meaning/notes. After tapping, it is replaced by the FSRS rating grid."
+  },
+  "learnRatingAgain": "Again",
+  "@learnRatingAgain": {
+    "description": "FSRS rating button label meaning 'failed recall — show again soon'. Maps to fsrs.Rating.again."
+  },
+  "learnRatingHard": "Hard",
+  "@learnRatingHard": {
+    "description": "FSRS rating button label meaning 'recalled with significant difficulty'. Maps to fsrs.Rating.hard."
+  },
+  "learnRatingGood": "Good",
+  "@learnRatingGood": {
+    "description": "FSRS rating button label meaning 'recalled correctly'. Maps to fsrs.Rating.good."
+  },
+  "learnRatingEasy": "Easy",
+  "@learnRatingEasy": {
+    "description": "FSRS rating button label meaning 'recalled with no effort'. Maps to fsrs.Rating.easy."
+  },
+  "learnToastRateError": "Failed to record rating",
+  "@learnToastRateError": {
+    "description": "Toast message shown when persisting a rating via LearningSessionManager.rateWord fails. The back of the card stays put for retry."
+  },
+  "learnDialogQuitTitle": "Quit session?",
+  "@learnDialogQuitTitle": {
+    "description": "Title of the quit-confirmation dialog shown when the user tries to leave a Learn / Review session early."
+  },
+  "learnDialogQuitMessage": "Progress for reviewed words has been saved. The remaining queue will be lost.",
+  "@learnDialogQuitMessage": {
+    "description": "Body of the quit-confirmation dialog. Explains that already-rated words are persisted but the rest of the queue is discarded."
+  },
+  "learnDialogQuitOk": "Quit",
+  "@learnDialogQuitOk": {
+    "description": "OK button label of the quit-confirmation dialog. Exits the session and returns to the dashboard."
+  },
+  "learnDialogQuitCancel": "Stay",
+  "@learnDialogQuitCancel": {
+    "description": "Cancel button label of the quit-confirmation dialog. Returns to the session."
+  },
+  "sessionCompleteTitle": "Session complete!",
+  "@sessionCompleteTitle": {
+    "description": "Heading on the post-session summary page after the queue is exhausted."
+  },
+  "sessionCompleteCounter": "{reviewedCount} {reviewedCount, plural, =1{word reviewed.} other{words reviewed.}}",
+  "@sessionCompleteCounter": {
+    "description": "Subtext on the post-session summary page. Shows the total number of words reviewed in this session. Uses ICU plural for word/words inflection.",
+    "placeholders": {
+      "reviewedCount": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "sessionCompleteBack": "Back to Dashboard",
+  "@sessionCompleteBack": {
+    "description": "Primary button label on the post-session summary page. Returns to the dashboard tab."
+  },
+  "wordDetailSectionStats": "Stats",
+  "@wordDetailSectionStats": {
+    "description": "Section header on the word detail page for the FSRS memory statistics (recall, difficulty, stability, timeline)."
+  },
+  "wordDetailSectionNotes": "Notes",
+  "@wordDetailSectionNotes": {
+    "description": "Section header on the word detail page for the user's notes attached to this word."
+  },
+  "wordDetailFabTooltip": "New note",
+  "@wordDetailFabTooltip": {
+    "description": "FloatingActionButton tooltip on the word detail page. Opens the note editor sheet."
+  },
+  "wordDetailTimelineCreated": "Created",
+  "@wordDetailTimelineCreated": {
+    "description": "Label of the timeline cell showing when the word was first added to the library."
+  },
+  "wordDetailTimelineLastReview": "Last review",
+  "@wordDetailTimelineLastReview": {
+    "description": "Label of the timeline cell showing the most recent review time. Shows 'Never' if the word has never been reviewed."
+  },
+  "wordDetailTimelineLastReviewNever": "Never",
+  "@wordDetailTimelineLastReviewNever": {
+    "description": "Placeholder value for the 'Last review' timeline cell when the word has not been reviewed yet."
+  },
+  "wordDetailTimelineNextDue": "Next due",
+  "@wordDetailTimelineNextDue": {
+    "description": "Label of the timeline cell showing when the word is next due for review (FSRS due date)."
+  },
+  "wordDetailMemoryRecall": "Recall",
+  "@wordDetailMemoryRecall": {
+    "description": "Label of the memory stats cell showing the FSRS recall probability as a percentage."
+  },
+  "wordDetailMemoryDifficulty": "Difficulty",
+  "@wordDetailMemoryDifficulty": {
+    "description": "Label of the memory stats cell showing the FSRS difficulty value (1.0–10.0 range, formatted to 1 decimal)."
+  },
+  "wordDetailMemoryStability": "Stability",
+  "@wordDetailMemoryStability": {
+    "description": "Label of the memory stats cell showing the FSRS stability value in days, with a 'd' suffix."
+  },
+  "wordDetailMemoryPlaceholder": "Rate this card to see memory stats",
+  "@wordDetailMemoryPlaceholder": {
+    "description": "Placeholder message shown in the memory stats section when the word has not been reviewed yet — no stats exist to display."
+  },
+  "wordDetailNotesEmpty": "No notes yet",
+  "@wordDetailNotesEmpty": {
+    "description": "Message shown inside the Notes section card when the word has no notes."
+  },
+  "wordDetailNoteEdit": "Edit",
+  "@wordDetailNoteEdit": {
+    "description": "Title of the 'Edit' ListTile in the per-note actions bottom sheet on the word detail page."
+  },
+  "wordDetailNoteMoveToTop": "Move to top",
+  "@wordDetailNoteMoveToTop": {
+    "description": "Title of the 'Move to top' ListTile in the per-note actions bottom sheet."
+  },
+  "wordDetailNoteDelete": "Delete",
+  "@wordDetailNoteDelete": {
+    "description": "Title of the destructive 'Delete' ListTile in the per-note actions bottom sheet on the word detail page."
+  },
+  "wordDetailNoteEditorHint": "Write a note...",
+  "@wordDetailNoteEditorHint": {
+    "description": "Placeholder hint text inside the TextField of the note editor bottom sheet."
+  },
+  "wordDetailNoteEditorCancel": "Cancel",
+  "@wordDetailNoteEditorCancel": {
+    "description": "Cancel button label in the note editor bottom sheet. Discards the new/edited note."
+  },
+  "wordDetailNoteEditorSave": "Save",
+  "@wordDetailNoteEditorSave": {
+    "description": "Save button label in the note editor bottom sheet. Persists the new/edited note."
+  },
+  "wordDetailNoteSaveError": "Failed to save note",
+  "@wordDetailNoteSaveError": {
+    "description": "Toast message shown when persisting a new or edited note fails."
+  },
+  "aiErrorNotConfigured": "AI not configured. Fill Base URL, Model, and API Key first.",
+  "@aiErrorNotConfigured": {
+    "description": "LLMException message shown when the user invokes an AI feature before saving a complete LLMConfig (base URL, model, API key all required)."
+  },
+  "aiErrorInvalidKey": "Invalid API key (401). Double-check the key.",
+  "@aiErrorInvalidKey": {
+    "description": "LLMException message shown when the LLM endpoint returns HTTP 401 (authentication failure)."
+  },
+  "aiErrorModelNotFound": "Model not found (404). Verify the model name and that {baseURL} serves an OpenAI-compatible API. (server: {message})",
+  "@aiErrorModelNotFound": {
+    "description": "LLMException message shown when the LLM endpoint returns HTTP 404 (model not found, or endpoint is not OpenAI-compatible).",
+    "placeholders": {
+      "baseURL": {
+        "type": "String",
+        "example": "https://api.openai.com/v1"
+      },
+      "message": {
+        "type": "String",
+        "example": "model 'gpt-5' not found"
+      }
+    }
+  },
+  "aiErrorRequestTimeout": "Request timed out (limit: {minutes} minutes). Check baseURL reachability.",
+  "@aiErrorRequestTimeout": {
+    "description": "LLMException message shown when the LLM request exceeds the 10-minute timeout. Usually indicates a network/proxy issue.",
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  "aiErrorCannotReach": "Cannot reach {baseURL}. Check the address and your network.",
+  "@aiErrorCannotReach": {
+    "description": "LLMException message shown when the LLM endpoint is unreachable (DNS failure, refused connection, etc.).",
+    "placeholders": {
+      "baseURL": {
+        "type": "String",
+        "example": "http://localhost:11434/v1"
+      }
+    }
+  },
+  "aiErrorGeneric": "AI error: {message}",
+  "@aiErrorGeneric": {
+    "description": "LLMException catch-all message for any other library-thrown error (400/403/409/422/429/5xx, parse errors, etc.).",
+    "placeholders": {
+      "message": {
+        "type": "String",
+        "example": "rate limit exceeded"
+      }
+    }
+  },
+  "aiErrorUnexpectedFormat": "AI returned an unexpected format. Try again.",
+  "@aiErrorUnexpectedFormat": {
+    "description": "EnhanceError message shown when the AI Enhance sheet receives a response that doesn't match the expected pinyin/meaning/notes structure (FormatException)."
+  },
+  "aiErrorUnknown": "AI error: {message}",
+  "@aiErrorUnknown": {
+    "description": "EnhanceError catch-all message for any non-LLMException thrown by the AI Enhancer. Kept separate from aiErrorGeneric so translators can adjust phrasing.",
+    "placeholders": {
+      "message": {
+        "type": "String",
+        "example": "rate limit exceeded"
+      }
+    }
+  },
+  "relativeNow": "now",
+  "@relativeNow": {
+    "description": "Relative-time label for timestamps within 60 seconds of 'now'. Used in word detail and dashboard."
+  },
+  "relativeJustNow": "just now",
+  "@relativeJustNow": {
+    "description": "Relative-time label for timestamps earlier today (UTC day boundary)."
+  },
+  "relativeInDays": "in {days} {days, plural, =1{day} other{days}}",
+  "@relativeInDays": {
+    "description": "Relative-time label for future dates. Uses ICU plural for day/days inflection.",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "relativeOverdueDays": "overdue by {overdue} {overdue, plural, =1{day} other{days}}",
+  "@relativeOverdueDays": {
+    "description": "Relative-time label for past dates past the UTC day boundary. Uses ICU plural for day/days inflection.",
+    "placeholders": {
+      "overdue": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  }
+}

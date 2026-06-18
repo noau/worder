@@ -9,6 +9,8 @@ import 'package:worder/config.dart';
 import 'package:worder/entity/llm_config.dart';
 import 'package:worder/repository.dart';
 import 'package:worder/service/ai_service.dart';
+import 'package:worder/util/context_l10n.dart';
+import 'package:worder/util/llm_error_localizer.dart';
 
 @RoutePage()
 class SettingsPage extends StatefulWidget {
@@ -19,10 +21,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  static const _saveErrorMessage = 'Failed to save settings';
-  static const _testSuccessMessage = 'Connection OK';
-  static const _testUnexpectedErrorMessage = 'Test failed: unexpected error';
-
   late final PreferencesRepository _repository;
   late final AIService _aiService;
   late final TextEditingController _baseURLController;
@@ -95,7 +93,7 @@ class _SettingsPageState extends State<SettingsPage> {
     try {
       await _repository.setLLMConfig(config: next);
     } catch (_) {
-      _safeToast(_saveErrorMessage);
+      _safeToast(context.l10n.settingsToastSaveError);
     }
   }
 
@@ -116,11 +114,11 @@ class _SettingsPageState extends State<SettingsPage> {
     await _saveConfig();
     try {
       await _aiService.testConnection();
-      _safeToast(_testSuccessMessage);
+      _safeToast(context.l10n.settingsToastTestSuccess);
     } on LLMException catch (e) {
-      _safeToast(e.message);
+      _safeToast(LlmErrorLocalizer.localizeLLMException(context, e));
     } catch (_) {
-      _safeToast(_testUnexpectedErrorMessage);
+      _safeToast(context.l10n.settingsToastTestUnexpectedError);
     } finally {
       if (mounted) setState(() => _isTesting = false);
     }
@@ -153,21 +151,24 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Theme', style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    context.l10n.settingsSectionTheme,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 16),
                   SegmentedButton<AdaptiveThemeMode>(
-                    segments: const [
+                    segments: [
                       ButtonSegment(
                         value: AdaptiveThemeMode.light,
-                        label: Text('Light'),
+                        label: Text(context.l10n.settingsThemeLight),
                       ),
                       ButtonSegment(
                         value: AdaptiveThemeMode.dark,
-                        label: Text('Dark'),
+                        label: Text(context.l10n.settingsThemeDark),
                       ),
                       ButtonSegment(
                         value: AdaptiveThemeMode.system,
-                        label: Text('System'),
+                        label: Text(context.l10n.settingsThemeSystem),
                       ),
                     ],
                     selected: {themeMode},
@@ -187,21 +188,21 @@ class _SettingsPageState extends State<SettingsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'AI Configuration',
+                    context.l10n.settingsSectionAiConfig,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Only OpenAI-compatible APIs are supported.',
+                    context.l10n.settingsAiConfigDescription,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _baseURLController,
                     focusNode: _baseURLFocus,
-                    decoration: const InputDecoration(
-                      labelText: 'Base URL',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.settingsFieldBaseUrl,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -209,19 +210,19 @@ class _SettingsPageState extends State<SettingsPage> {
                     controller: _apiKeyController,
                     focusNode: _apiKeyFocus,
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'API Key',
-                      helperText: 'Hidden for privacy',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.settingsFieldApiKey,
+                      helperText: context.l10n.settingsFieldApiKeyHelper,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _modelController,
                     focusNode: _modelFocus,
-                    decoration: const InputDecoration(
-                      labelText: 'Model',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.settingsFieldModel,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -239,7 +240,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text('Test'),
+                            : Text(context.l10n.settingsTestButton),
                       ),
                     ),
                   ),

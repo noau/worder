@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Android launcher label. Worder 0.1.0 ships English-only here;
+      when the first non-en ARB (e.g. intl_zh.arb) is added, drop in a
+      values-zh/strings.xml mirroring this file with a translated
+      <string name="app_name">...</string>. One values-zh/ covers
+      zh-Hans-CN / zh-Hant-TW / zh-Hant-HK — Android does not distinguish
+      by script in resource-folder names.
+    -->
+    <string name="app_name">Worder</string>
+</resources>

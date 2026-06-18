@@ -1,0 +1,7 @@
+{
+  "@@locale": "zh_Hans_CN",
+  "appTitle": "缀字",
+  "@appTitle": {
+    "description": "Application display name shown in the title bar, the Android launcher (via strings.xml), and system task switchers."
+  }
+}

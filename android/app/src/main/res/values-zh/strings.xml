@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Localized Android launcher label for zh-Hans-CN (Simplified Chinese,
+      China). Resolved by Android when the system language is one of:
+      zh-CN, zh-Hans-CN, or any zh-Hans variant.
+    -->
+    <string name="app_name">缀字</string>
+</resources>

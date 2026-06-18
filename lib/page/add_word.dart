@@ -8,6 +8,8 @@ import 'package:worder/entity/word_model.dart';
 import 'package:worder/manager/ai_enhancer.dart';
 import 'package:worder/manager/enhance_field.dart';
 import 'package:worder/service/ai_service.dart';
+import 'package:worder/util/context_l10n.dart';
+import 'package:worder/util/llm_error_localizer.dart';
 
 @RoutePage()
 class AddWordPage extends StatefulWidget {
@@ -18,9 +20,6 @@ class AddWordPage extends StatefulWidget {
 }
 
 class _AddWordPageState extends State<AddWordPage> {
-  static const _saveErrorMessage = 'Failed to save the word';
-  static const _savedMessage = 'Saved';
-
   late final TextEditingController _wordCtrl;
   late final TextEditingController _pinyinCtrl;
   late final TextEditingController _meaningCtrl;
@@ -72,6 +71,11 @@ class _AddWordPageState extends State<AddWordPage> {
   }
 
   Future<void> _onEnhance() async {
+    // Read the current app locale at the moment the sheet opens. The
+    // enhancer bakes this into the LLM prompt's output-language directive,
+    // so the meaning / note come back in the same language the user is
+    // seeing the rest of the UI in.
+    final locale = Localizations.localeOf(context);
     final result = await showModalBottomSheet<EnhanceResult>(
       context: context,
       // Indismissable by design: no drag handle, no swipe-down, no
@@ -86,6 +90,7 @@ class _AddWordPageState extends State<AddWordPage> {
       constraints: BoxConstraints(minHeight: 600),
       builder: (_) => _EnhanceSheet(
         aiService: _aiService,
+        outputLocale: locale,
         word: _wordCtrl.text.trim(),
         originalPinyin: _pinyinCtrl.text.trim(),
         originalMeaning: _meaningCtrl.text.trim(),
@@ -102,10 +107,10 @@ class _AddWordPageState extends State<AddWordPage> {
     final dbService = context.read<AppDatabase>();
     final result = await showOkCancelAlertDialog(
       context: context,
-      title: 'Save this word?',
-      message: 'A new word entry will be created.',
-      okLabel: 'Save',
-      cancelLabel: 'Cancel',
+      title: context.l10n.addWordSaveDialogTitle,
+      message: context.l10n.addWordSaveDialogMessage,
+      okLabel: context.l10n.addWordSaveDialogOk,
+      cancelLabel: context.l10n.addWordSaveDialogCancel,
     );
     if (result != OkCancelResult.ok) return;
     final wordText = _wordCtrl.text.trim();
@@ -122,7 +127,7 @@ class _AddWordPageState extends State<AddWordPage> {
       await dbService.saveWord(word);
     } catch (_) {
       if (!mounted) return;
-      BotToast.showText(text: _saveErrorMessage);
+      BotToast.showText(text: context.l10n.addWordToastSaveError);
       return;
     }
     if (!mounted) return;
@@ -131,13 +136,13 @@ class _AddWordPageState extends State<AddWordPage> {
     _meaningCtrl.clear();
     _noteCtrl.clear();
     _wordFocus.requestFocus();
-    BotToast.showText(text: _savedMessage);
+    BotToast.showText(text: context.l10n.addWordToastSaveSuccess);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('New Word')),
+      appBar: AppBar(title: Text(context.l10n.addWordAppBarTitle)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 96, 16, 16),
         children: [
@@ -146,18 +151,18 @@ class _AddWordPageState extends State<AddWordPage> {
             focusNode: _wordFocus,
             autofocus: true,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              labelText: 'Word',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: context.l10n.addWordFieldWord,
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _pinyinCtrl,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
-              labelText: 'Pinyin',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: context.l10n.addWordFieldPinyin,
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
@@ -166,9 +171,9 @@ class _AddWordPageState extends State<AddWordPage> {
             minLines: 1,
             maxLines: null,
             textInputAction: TextInputAction.newline,
-            decoration: const InputDecoration(
-              labelText: 'Meaning',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: context.l10n.addWordFieldMeaning,
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
@@ -177,9 +182,9 @@ class _AddWordPageState extends State<AddWordPage> {
             minLines: 1,
             maxLines: null,
             textInputAction: TextInputAction.newline,
-            decoration: const InputDecoration(
-              labelText: 'Note (optional)',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: context.l10n.addWordFieldNote,
+              border: const OutlineInputBorder(),
             ),
           ),
         ],
@@ -197,7 +202,7 @@ class _AddWordPageState extends State<AddWordPage> {
                         ? _onEnhance
                         : null,
                     icon: const Icon(Icons.auto_awesome),
-                    label: const Text('AI Enhance'),
+                    label: Text(context.l10n.addWordAiEnhanceButton),
                   ),
                 ),
               ),
@@ -207,7 +212,7 @@ class _AddWordPageState extends State<AddWordPage> {
                   valueListenable: _canConfirm,
                   builder: (_, can, _) => FilledButton(
                     onPressed: can ? _onConfirm : null,
-                    child: const Text('Confirm'),
+                    child: Text(context.l10n.addWordConfirmButton),
                   ),
                 ),
               ),
@@ -242,6 +247,7 @@ class _AddWordPageState extends State<AddWordPage> {
 class _EnhanceSheet extends StatefulWidget {
   const _EnhanceSheet({
     required this.aiService,
+    required this.outputLocale,
     required this.word,
     required this.originalPinyin,
     required this.originalMeaning,
@@ -249,6 +255,7 @@ class _EnhanceSheet extends StatefulWidget {
   });
 
   final AIService aiService;
+  final Locale outputLocale;
   final String word;
   final String originalPinyin;
   final String originalMeaning;
@@ -284,7 +291,10 @@ class _EnhanceSheetState extends State<_EnhanceSheet> {
     _pinyinCtrl = TextEditingController(text: widget.originalPinyin);
     _meaningCtrl = TextEditingController(text: widget.originalMeaning);
     _noteCtrl = TextEditingController(text: widget.originalNote);
-    _enhancer = AIEnhancer(aiService: widget.aiService);
+    _enhancer = AIEnhancer(
+      aiService: widget.aiService,
+      outputLocale: widget.outputLocale,
+    );
     _enhancer.state.addListener(_onEnhancerStateChanged);
     _enhancer.start(
       word: widget.word,
@@ -410,7 +420,7 @@ class _EnhanceSheetState extends State<_EnhanceSheet> {
             builder: (context, state, _) {
               return switch (state) {
                 EnhanceInitial() || EnhanceLoading() => const _LoadingView(),
-                EnhanceError(:final message) => _ErrorView(message: message),
+                EnhanceError error => _ErrorView(error: error),
                 EnhanceSuccess(:final result) => _SuccessView(
                   pinyinCtrl: _pinyinCtrl,
                   meaningCtrl: _meaningCtrl,
@@ -449,7 +459,7 @@ class _LoadingView extends StatelessWidget {
         children: [
           CircularProgressIndicator(),
           SizedBox(height: 16),
-          Text('Asking the AI to enhance your word…'),
+          Text(context.l10n.addWordEnhanceLoading),
         ],
       ),
     );
@@ -457,13 +467,14 @@ class _LoadingView extends StatelessWidget {
 }
 
 class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.message});
+  const _ErrorView({required this.error});
 
-  final String message;
+  final EnhanceError error;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final message = LlmErrorLocalizer.localizeEnhanceError(context, error);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: Column(
@@ -480,7 +491,7 @@ class _ErrorView extends StatelessWidget {
           const SizedBox(height: 16),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(context.l10n.addWordEnhanceErrorClose),
           ),
         ],
       ),
@@ -581,9 +592,9 @@ class _FieldRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final labelText = switch (field) {
-      EnhanceField.pinyin => 'Pinyin',
-      EnhanceField.meaning => 'Meaning',
-      EnhanceField.note => 'Note',
+      EnhanceField.pinyin => context.l10n.addWordFieldPinyin,
+      EnhanceField.meaning => context.l10n.addWordFieldMeaning,
+      EnhanceField.note => context.l10n.addWordFieldNote,
     };
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -606,7 +617,7 @@ class _FieldRow extends StatelessWidget {
           children: [
             IconButton(
               icon: const Icon(Icons.refresh),
-              tooltip: 'Re-generate',
+              tooltip: context.l10n.addWordEnhanceRegenerateTooltip,
               onPressed: isLoading ? null : () => onRegenerate(field),
             ),
             // Restore button tracks the controller via ValueListenableBuilder
@@ -618,7 +629,7 @@ class _FieldRow extends StatelessWidget {
                 final atOriginal = value.text.trim() == original.trim();
                 return IconButton(
                   icon: const Icon(Icons.undo),
-                  tooltip: 'Restore original',
+                  tooltip: context.l10n.addWordEnhanceRestoreTooltip,
                   onPressed: (isLoading || atOriginal)
                       ? null
                       : () {
@@ -662,7 +673,7 @@ class _ActionBar extends StatelessWidget {
         OutlinedButton.icon(
           onPressed: isLoading ? null : onRegenerateAll,
           icon: const Icon(Icons.auto_awesome),
-          label: const Text('Re-generate all'),
+          label: Text(context.l10n.addWordEnhanceRegenerateAll),
         ),
         Row(
           spacing: 8,
@@ -673,13 +684,13 @@ class _ActionBar extends StatelessWidget {
                 // pops the sheet. The sheet's dispose() then disposes the
                 // enhancer, which aborts again (idempotent).
                 onPressed: onCancel,
-                child: const Text('Cancel'),
+                child: Text(context.l10n.addWordEnhanceCancel),
               ),
             ),
             Expanded(
               child: FilledButton(
                 onPressed: isLoading ? null : onConfirm,
-                child: const Text('Confirm'),
+                child: Text(context.l10n.addWordEnhanceConfirm),
               ),
             ),
           ],

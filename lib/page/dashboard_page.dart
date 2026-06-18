@@ -10,11 +10,10 @@ import 'package:worder/database.dart';
 import 'package:worder/entity/word_model.dart';
 import 'package:worder/repository.dart';
 import 'package:worder/routing.dart';
+import 'package:worder/util/context_l10n.dart';
 import 'package:worder/util/date_format.dart';
 import 'package:worder/util/day_rollover_stream.dart';
 import 'package:worder/widget/dashboard_word_card.dart';
-
-const String _kSlogan = 'Every word, one step further.';
 
 @RoutePage()
 class DashboardPage extends StatefulWidget {
@@ -125,7 +124,7 @@ class _DashboardPageState extends State<DashboardPage> {
       dueCount = await svc.getExpiredWordsCount();
     } catch (_) {
       if (!mounted) return;
-      BotToast.showText(text: 'Could not load review status');
+      BotToast.showText(text: context.l10n.dashboardErrorCouldNotLoadReviewStatus);
       return;
     }
     if (!mounted) return;
@@ -133,13 +132,10 @@ class _DashboardPageState extends State<DashboardPage> {
       final result = await showOkCancelAlertDialog(
         context: context,
         barrierDismissible: false,
-        title: 'Review work waiting',
-        message:
-            '$dueCount word${dueCount == 1 ? '' : 's'} '
-            '${dueCount == 1 ? 'is' : 'are'} due for review. '
-            'Review them first, or continue with learning?',
-        okLabel: 'Review',
-        cancelLabel: 'Continue learning',
+        title: context.l10n.dashboardDialogReviewFirstTitle,
+        message: context.l10n.dashboardDialogReviewFirstMessage(dueCount),
+        okLabel: context.l10n.dashboardDialogReviewFirstOk,
+        cancelLabel: context.l10n.dashboardDialogReviewFirstCancel,
       );
       if (!mounted || result == OkCancelResult.ok) return;
     }
@@ -150,16 +146,15 @@ class _DashboardPageState extends State<DashboardPage> {
       words = await svc.getLearningWords(limit: prefs.learnBatchSize);
     } catch (_) {
       if (!mounted) return;
-      BotToast.showText(text: 'Could not load learning words');
+      BotToast.showText(text: context.l10n.dashboardErrorCouldNotLoadLearningWords);
       return;
     }
     if (!mounted) return;
     if (words.isEmpty) {
       await showOkAlertDialog(
         context: context,
-        title: 'No new words yet',
-        message:
-            'You have no new words to learn right now. Try to add some new words!',
+        title: context.l10n.dashboardDialogNoNewWordsTitle,
+        message: context.l10n.dashboardDialogNoNewWordsMessage,
       );
       return;
     }
@@ -178,16 +173,15 @@ class _DashboardPageState extends State<DashboardPage> {
       words = await svc.getExpiredWords(limit: prefs.reviewBatchSize);
     } catch (_) {
       if (!mounted) return;
-      BotToast.showText(text: 'Could not load review words');
+      BotToast.showText(text: context.l10n.dashboardErrorCouldNotLoadReviewWords);
       return;
     }
     if (!mounted) return;
     if (words.isEmpty) {
       await showOkAlertDialog(
         context: context,
-        title: 'All caught up!',
-        message:
-            'You have no words due for review right now. Try to learn some new words!',
+        title: context.l10n.dashboardDialogAllCaughtUpTitle,
+        message: context.l10n.dashboardDialogAllCaughtUpMessage,
       );
       return;
     }
@@ -204,7 +198,10 @@ class _DashboardPageState extends State<DashboardPage> {
           // 更新。无需 StreamBuilder(每天最多更新一次,StreamBuilder 是 overkill)。
           // BUG FIX (review#1): 之前的 StreamBuilder + initState `.listen()` 双订阅
           // 单订阅流导致首次 build 崩溃。已重构为本字段 + 单一 listener。
-          _Header(date: formatAbsoluteDate(_currentDate), days: _daysLearnt),
+          _Header(
+            date: formatAbsoluteDate(context, _currentDate),
+            days: _daysLearnt,
+          ),
           const SizedBox(height: 16),
           _StatsCard(
             expired: _expiredStream,
@@ -240,10 +237,10 @@ class _Header extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Worder', style: theme.textTheme.headlineMedium),
+            Text(context.l10n.appTitle, style: theme.textTheme.headlineMedium),
             const SizedBox(height: 2),
             Text(
-              _kSlogan,
+              context.l10n.dashboardSlogan,
               style: theme.textTheme.titleSmall?.copyWith(
                 color: colors.onSurfaceVariant,
               ),
@@ -256,7 +253,10 @@ class _Header extends StatelessWidget {
           children: [
             Text(date, style: theme.textTheme.titleMedium),
             const SizedBox(height: 2),
-            Text('Day $days', style: theme.textTheme.titleMedium),
+            Text(
+              context.l10n.dashboardDayCounter(days),
+              style: theme.textTheme.titleMedium,
+            ),
           ],
         ),
       ],
@@ -293,7 +293,7 @@ class _StatsCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _StatCell(
-                      label: 'Need to Review',
+                      label: context.l10n.dashboardStatNeedToReview,
                       stream: expired,
                       streamName: 'expired',
                       onError: onError,
@@ -302,7 +302,7 @@ class _StatsCard extends StatelessWidget {
                   VerticalDivider(width: 1, color: dividerColor),
                   Expanded(
                     child: _StatCell(
-                      label: 'Reviewed Today',
+                      label: context.l10n.dashboardStatReviewedToday,
                       stream: reviewed,
                       streamName: 'reviewed',
                       onError: onError,
@@ -319,14 +319,14 @@ class _StatsCard extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: onReview,
-                    child: const Text('Review'),
+                    child: Text(context.l10n.dashboardReviewButton),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: FilledButton.tonal(
                     onPressed: onLearn,
-                    child: const Text('Learn'),
+                    child: Text(context.l10n.dashboardLearnButton),
                   ),
                 ),
               ],
@@ -400,7 +400,10 @@ class _RecentSection extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Text('Recently reviewed', style: theme.textTheme.titleMedium),
+          child: Text(
+            context.l10n.dashboardRecentlyReviewed,
+            style: theme.textTheme.titleMedium,
+          ),
         ),
         const SizedBox(height: 8),
         StreamBuilder<List<WordModel>>(
@@ -408,7 +411,9 @@ class _RecentSection extends StatelessWidget {
           builder: (_, snap) {
             if (snap.hasError) {
               onError('recent', snap.error!);
-              return const _InlineMsg(text: 'Could not load recent reviews.');
+              return _InlineMsg(
+                text: context.l10n.dashboardErrorCouldNotLoadRecentReviews,
+              );
             }
             if (snap.connectionState == ConnectionState.waiting &&
                 !snap.hasData) {
@@ -419,7 +424,7 @@ class _RecentSection extends StatelessWidget {
             }
             final words = snap.data ?? const <WordModel>[];
             if (words.isEmpty) {
-              return const _InlineMsg(text: 'No reviewed words yet.');
+              return _InlineMsg(text: context.l10n.dashboardEmptyNoReviewedYet);
             }
             return Column(
               children: [

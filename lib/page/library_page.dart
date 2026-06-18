@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:worder/database.dart';
 import 'package:worder/entity/word_model.dart';
 import 'package:worder/routing.dart';
+import 'package:worder/util/context_l10n.dart';
 import 'package:worder/widget/library_word_card.dart';
 
 @RoutePage()
@@ -19,9 +20,6 @@ class LibraryPage extends StatefulWidget {
 }
 
 class _LibraryPageState extends State<LibraryPage> {
-  static const _deletedMessage = 'Deleted';
-  static const _deleteErrorMessage = 'Failed to delete the word';
-
   // Cached so _retry can replace it with a fresh stream and trigger
   // StreamBuilder to re-subscribe. Calling watchAllWords() in build() would
   // return a new Stream per build, causing redundant re-subscriptions.
@@ -68,11 +66,10 @@ class _LibraryPageState extends State<LibraryPage> {
     final db = context.read<AppDatabase>();
     final ok = await showOkCancelAlertDialog(
       context: context,
-      title: 'Delete this word?',
-      message:
-          '"${word.word}" will be removed from your library. This cannot be undone.',
-      okLabel: 'Delete',
-      cancelLabel: 'Cancel',
+      title: context.l10n.libraryDialogDeleteTitle,
+      message: context.l10n.libraryDialogDeleteMessage(word.word),
+      okLabel: context.l10n.libraryDialogDeleteOk,
+      cancelLabel: context.l10n.libraryDialogDeleteCancel,
       isDestructiveAction: true,
     );
     if (ok != OkCancelResult.ok) return;
@@ -80,11 +77,11 @@ class _LibraryPageState extends State<LibraryPage> {
       await db.deleteWord(word);
     } catch (_) {
       if (!mounted) return;
-      BotToast.showText(text: _deleteErrorMessage);
+      BotToast.showText(text: context.l10n.libraryToastDeleteError);
       return;
     }
     if (!mounted) return;
-    BotToast.showText(text: _deletedMessage);
+    BotToast.showText(text: context.l10n.libraryToastDeleteSuccess);
   }
 
   @override
@@ -171,11 +168,14 @@ class _ErrorState extends StatelessWidget {
           Icon(Icons.error_outline, size: 64, color: colors.error),
           const SizedBox(height: 16),
           Text(
-            "Couldn't load your library",
+            context.l10n.libraryErrorLoadTitle,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 16),
-          FilledButton.tonal(onPressed: onRetry, child: const Text('Retry')),
+          FilledButton.tonal(
+            onPressed: onRetry,
+            child: Text(context.l10n.libraryErrorRetry),
+          ),
         ],
       ),
     );
@@ -201,10 +201,13 @@ class _EmptyState extends StatelessWidget {
               color: colors.onSurfaceVariant,
             ),
             const SizedBox(height: 16),
-            Text('Library is empty', style: theme.textTheme.titleMedium),
+            Text(
+              context.l10n.libraryEmptyTitle,
+              style: theme.textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             Text(
-              'Add your first word to start building your collection',
+              context.l10n.libraryEmptyMessage,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colors.onSurfaceVariant,
@@ -214,7 +217,7 @@ class _EmptyState extends StatelessWidget {
             FilledButton.icon(
               onPressed: () => context.pushRoute(AddWordRoute()),
               icon: const Icon(Icons.add),
-              label: const Text('Add Word'),
+              label: Text(context.l10n.libraryEmptyAddButton),
             ),
           ],
         ),
@@ -259,7 +262,10 @@ class _CardActionsSheet extends StatelessWidget {
           const Divider(height: 1),
           ListTile(
             leading: Icon(Icons.delete_outline, color: error),
-            title: Text('Delete', style: TextStyle(color: error)),
+            title: Text(
+              context.l10n.libraryActionsDelete,
+              style: TextStyle(color: error),
+            ),
             onTap: () {
               Navigator.of(context).pop();
               onDelete();

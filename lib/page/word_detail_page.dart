@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:worder/database.dart';
 import 'package:worder/entity/word_model.dart';
 import 'package:worder/repository.dart';
+import 'package:worder/util/context_l10n.dart';
 import 'package:worder/util/date_format.dart';
 
 /// 单个 word 的详情页。
@@ -24,8 +25,6 @@ class WordDetailPage extends StatefulWidget {
 }
 
 class _WordDetailPageState extends State<WordDetailPage> {
-  static const _noteSaveErrorMessage = 'Failed to save note';
-
   /// `watchAllWords()` 是按 id 过滤的单条流,缓存于 State 避免重复订阅
   /// (参照 `LibraryPage` 同款模式)。
   late final Stream<WordModel?> _stream;
@@ -48,7 +47,7 @@ class _WordDetailPageState extends State<WordDetailPage> {
       await db.saveWord(_latest.copyWith(notes: notes));
     } catch (_) {
       if (!mounted) return;
-      BotToast.showText(text: _noteSaveErrorMessage);
+      BotToast.showText(text: context.l10n.wordDetailNoteSaveError);
     }
   }
 
@@ -149,10 +148,16 @@ class _WordDetailPageState extends State<WordDetailPage> {
                 children: [
                   _WordInfoArea(word: word),
                   const SizedBox(height: 16),
-                  Text("Stats", style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    context.l10n.wordDetailSectionStats,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   _FsrsInfoArea(word: word),
                   const SizedBox(height: 16),
-                  Text("Notes", style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    context.l10n.wordDetailSectionNotes,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   _NoteArea(word: word, onLongPressNote: _openNoteActions),
                 ],
               ),
@@ -172,7 +177,7 @@ class _WordDetailPageState extends State<WordDetailPage> {
       // 或者把 _NoteEditorSheet 的保存路径加一个 `if (!_latest.alive) return;` 守卫。
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openNoteEditor(),
-        tooltip: 'New note',
+        tooltip: context.l10n.wordDetailFabTooltip,
         child: const Icon(Icons.add),
       ),
     );
@@ -289,22 +294,24 @@ class _TimelineRow extends StatelessWidget {
       children: [
         _TimelineCell(
           icon: Icons.event_outlined,
-          label: 'Created',
-          value: formatAbsoluteDate(word.createAt),
+          label: context.l10n.wordDetailTimelineCreated,
+          value: formatAbsoluteDate(context, word.createAt),
         ),
         _TimelineCell(
           icon: Icons.history,
-          label: 'Last review',
+          label: context.l10n.wordDetailTimelineLastReview,
           value: card.lastReview == null
-              ? 'Never'
-              : formatAbsoluteDate(card.lastReview!),
-          sub: card.lastReview == null ? '' : formatRelative(card.lastReview!),
+              ? context.l10n.wordDetailTimelineLastReviewNever
+              : formatAbsoluteDate(context, card.lastReview!),
+          sub: card.lastReview == null
+              ? ''
+              : formatRelative(context, card.lastReview!),
         ),
         _TimelineCell(
           icon: Icons.update,
-          label: 'Next due',
-          value: formatAbsoluteDate(card.due),
-          sub: formatRelative(card.due),
+          label: context.l10n.wordDetailTimelineNextDue,
+          value: formatAbsoluteDate(context, card.due),
+          sub: formatRelative(context, card.due),
         ),
       ],
     );
@@ -341,7 +348,7 @@ class _MemoryStatsRow extends StatelessWidget {
       children: [
         _TimelineCell(
           icon: Icons.psychology_outlined,
-          label: 'Recall',
+          label: context.l10n.wordDetailMemoryRecall,
           value: '${(r * 100).round()}%',
           secondaryWidget: Padding(
             padding: const EdgeInsets.only(top: 4),
@@ -354,12 +361,12 @@ class _MemoryStatsRow extends StatelessWidget {
         ),
         _TimelineCell(
           icon: Icons.terrain_outlined,
-          label: 'Difficulty',
+          label: context.l10n.wordDetailMemoryDifficulty,
           value: card.difficulty!.toStringAsFixed(1),
         ),
         _TimelineCell(
           icon: Icons.hourglass_bottom_outlined,
-          label: 'Stability',
+          label: context.l10n.wordDetailMemoryStability,
           value: '${card.stability!.toStringAsFixed(1)} d',
         ),
       ],
@@ -392,7 +399,7 @@ class _MemoryStatsPlaceholder extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Rate this card to see memory stats',
+              context.l10n.wordDetailMemoryPlaceholder,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colors.onSurfaceVariant,
               ),
@@ -491,7 +498,7 @@ class _NoteArea extends StatelessWidget {
           padding: const EdgeInsets.all(32),
           child: Center(
             child: Text(
-              'No notes yet',
+              context.l10n.wordDetailNotesEmpty,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: colors.onSurfaceVariant,
               ),
@@ -575,7 +582,7 @@ class _NoteActionsSheet extends StatelessWidget {
           const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.edit_outlined),
-            title: const Text('Edit'),
+            title: Text(context.l10n.wordDetailNoteEdit),
             onTap: () {
               context.pop();
               onEdit();
@@ -583,7 +590,7 @@ class _NoteActionsSheet extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.vertical_align_top),
-            title: const Text('Move to top'),
+            title: Text(context.l10n.wordDetailNoteMoveToTop),
             enabled: !atTop,
             onTap: atTop
                 ? null
@@ -594,7 +601,10 @@ class _NoteActionsSheet extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.delete_outline, color: error),
-            title: Text('Delete', style: TextStyle(color: error)),
+            title: Text(
+              context.l10n.wordDetailNoteDelete,
+              style: TextStyle(color: error),
+            ),
             onTap: () {
               context.pop();
               onDelete();
@@ -628,7 +638,6 @@ class _NoteEditorSheet extends StatefulWidget {
 class _NoteEditorSheetState extends State<_NoteEditorSheet> {
   // TODO: Change to soft limit that alerts user and provide AI summary action (if AI set)
   static const _maxLength = 120;
-  static const _saveErrorMessage = 'Failed to save note';
 
   late final TextEditingController _controller;
   bool _canSave = false;
@@ -674,7 +683,7 @@ class _NoteEditorSheetState extends State<_NoteEditorSheet> {
     } catch (_) {
       if (!mounted) return;
       setState(() => _isSaving = false);
-      BotToast.showText(text: _saveErrorMessage);
+      BotToast.showText(text: context.l10n.wordDetailNoteSaveError);
       return;
     }
     if (!mounted) return;
@@ -716,9 +725,9 @@ class _NoteEditorSheetState extends State<_NoteEditorSheet> {
               maxLines: null,
               maxLength: _maxLength,
               autofocus: true,
-              decoration: const InputDecoration(
-                hintText: 'Write a note...',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: context.l10n.wordDetailNoteEditorHint,
+                border: const OutlineInputBorder(),
               ),
               onChanged: (v) => setState(() => _canSave = v.trim().isNotEmpty),
             ),
@@ -728,12 +737,12 @@ class _NoteEditorSheetState extends State<_NoteEditorSheet> {
               children: [
                 TextButton(
                   onPressed: _isSaving ? null : () => context.pop(),
-                  child: const Text('Cancel'),
+                  child: Text(context.l10n.wordDetailNoteEditorCancel),
                 ),
                 const SizedBox(width: 8),
                 FilledButton(
                   onPressed: (_canSave && !_isSaving) ? _save : null,
-                  child: const Text('Save'),
+                  child: Text(context.l10n.wordDetailNoteEditorSave),
                 ),
               ],
             ),

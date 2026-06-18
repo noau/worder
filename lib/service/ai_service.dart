@@ -64,9 +64,7 @@ class AIService {
   }) async {
     final config = _config;
     if (config.isEmpty) {
-      throw const LLMException(
-        'AI not configured. Fill Base URL, Model, and API Key first.',
-      );
+      throw const LLMException(LLMErrorKind.notConfigured);
     }
     final client = _buildClient(config);
     try {
@@ -76,26 +74,26 @@ class AIService {
     } on AuthenticationException {
       // 401 — by far the most common error on a fresh key paste.
       log('AIService.$methodName: 401', name: 'AIService');
-      throw const LLMException('Invalid API key (401). Double-check the key.');
+      throw const LLMException(LLMErrorKind.invalidApiKey);
     } on NotFoundException catch (e) {
       // 404 — model name typo or wrong baseURL path.
       log('AIService.$methodName: 404 ${e.message}', name: 'AIService');
       throw LLMException(
-        'Model not found (404). Verify the model name and that '
-        '${config.baseURL} serves an OpenAI-compatible API. '
-        '(server: ${e.message})',
+        LLMErrorKind.modelNotFound,
+        params: {'baseURL': config.baseURL, 'message': e.message},
       );
     } on RequestTimeoutException {
       log('AIService.$methodName: timeout', name: 'AIService');
       throw LLMException(
-        'Request timed out (limit: ${kLLMRequestTimeout.inMinutes} minutes). '
-        'Check baseURL reachability.',
+        LLMErrorKind.requestTimeout,
+        params: {'minutes': kLLMRequestTimeout.inMinutes},
       );
     } on ConnectionException catch (e) {
       // DNS / refused / no-network — baseURL is the prime suspect.
       log('AIService.$methodName: connection ${e.url}', name: 'AIService');
       throw LLMException(
-        'Cannot reach ${config.baseURL}. Check the address and your network.',
+        LLMErrorKind.cannotReach,
+        params: {'baseURL': config.baseURL},
       );
     } on OpenAIException catch (e) {
       // Catch-all base: covers 400/403/409/422/429/5xx, ParseException,
@@ -105,7 +103,10 @@ class AIService {
         'AIService.$methodName: ${e.runtimeType} ${e.message}',
         name: 'AIService',
       );
-      throw LLMException('AI error: ${e.message}');
+      throw LLMException(
+        LLMErrorKind.generic,
+        params: {'message': e.message},
+      );
     } finally {
       client.close();
     }
@@ -172,9 +173,40 @@ class AIService {
   }
 }
 
-/// User-facing AI error. `message` is short and ready for a BotToast.
-class LLMException implements Exception {
-  const LLMException(this.message);
+/// User-facing AI error kind. Each value maps to one ARB key in the `ai*`
+/// section of `intl_en.arb`. `params` carries the values needed to fill
+/// the placeholders declared in the corresponding ARB entry.
+enum LLMErrorKind {
+  /// No `baseURL` / `modelName` / `apiKey` configured.
+  notConfigured,
 
-  final String message;
+  /// HTTP 401 from the LLM endpoint.
+  invalidApiKey,
+
+  /// HTTP 404 (model typo, or endpoint not OpenAI-compatible).
+  modelNotFound,
+
+  /// Request exceeded `kLLMRequestTimeout`.
+  requestTimeout,
+
+  /// DNS failure / connection refused / no network.
+  cannotReach,
+
+  /// Catch-all base for 400/403/409/422/429/5xx, ParseException, etc.
+  generic,
+}
+
+/// User-facing AI error.
+///
+/// Holds a [kind] (mapped to an ARB key) and optional placeholder [params]
+/// (string keys matching the ARB placeholders). UI layers call
+/// [LlmErrorLocalizer.localizeLLMException] to resolve to a localized
+/// `String` at display time. The service is locale-agnostic by design:
+/// keeping the data and the presentation separate means unit tests can
+/// assert on `kind` without a `BuildContext`.
+class LLMException implements Exception {
+  const LLMException(this.kind, {this.params});
+
+  final LLMErrorKind kind;
+  final Map<String, Object>? params;
 }

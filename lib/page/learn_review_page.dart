@@ -13,6 +13,7 @@ import 'package:worder/entity/word_model.dart';
 import 'package:worder/manager/learning_session_manager.dart';
 import 'package:worder/repository.dart';
 import 'package:worder/routing.dart';
+import 'package:worder/util/context_l10n.dart';
 
 /// Hosts one Review / Learn session.
 ///
@@ -91,7 +92,7 @@ class _LearnReviewPageState extends State<LearnReviewPage> {
       if (!mounted) return;
       setState(() => _isRating = false);
       log('LearnReviewPage.rateWord error: $e', name: 'LearnReviewPage');
-      BotToast.showText(text: 'Failed to record rating');
+      BotToast.showText(text: context.l10n.learnToastRateError);
       // Stay on the same back card so the user can retry the same grade.
     }
   }
@@ -104,12 +105,10 @@ class _LearnReviewPageState extends State<LearnReviewPage> {
     }
     final result = await showOkCancelAlertDialog(
       context: context,
-      title: 'Quit session?',
-      message:
-          'Progress for reviewed words has been saved. '
-          'The remaining queue will be lost.',
-      okLabel: 'Quit',
-      cancelLabel: 'Stay',
+      title: context.l10n.learnDialogQuitTitle,
+      message: context.l10n.learnDialogQuitMessage,
+      okLabel: context.l10n.learnDialogQuitOk,
+      cancelLabel: context.l10n.learnDialogQuitCancel,
     );
     if (!mounted) return;
     if (result == OkCancelResult.ok) {
@@ -212,7 +211,7 @@ class _Header extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: onBack,
-          tooltip: 'Quit session',
+          tooltip: context.l10n.learnBackTooltip,
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -227,7 +226,7 @@ class _Header extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         Text(
-          '$reviewed / $total',
+          context.l10n.learnHeaderProgressCounter(reviewed, total),
           style: theme.textTheme.titleSmall?.copyWith(
             color: colors.onSurfaceVariant,
           ),
@@ -320,7 +319,7 @@ class _RevealButton extends StatelessWidget {
       child: FilledButton.tonalIcon(
         onPressed: enabled ? onTap : null,
         icon: const Icon(Icons.visibility_outlined),
-        label: const Text('Reveal'),
+        label: Text(context.l10n.learnRevealButton),
       ),
     );
   }
@@ -349,7 +348,7 @@ class _RatingButtons extends StatelessWidget {
             Expanded(
               child: _RatingButton(
                 icon: Icons.refresh,
-                label: 'Again',
+                label: context.l10n.learnRatingAgain,
                 rating: fsrs.Rating.again,
                 onRate: onRate,
                 enabled: enabled,
@@ -358,7 +357,7 @@ class _RatingButtons extends StatelessWidget {
             Expanded(
               child: _RatingButton(
                 icon: Icons.trending_down,
-                label: 'Hard',
+                label: context.l10n.learnRatingHard,
                 rating: fsrs.Rating.hard,
                 onRate: onRate,
                 enabled: enabled,
@@ -372,7 +371,7 @@ class _RatingButtons extends StatelessWidget {
             Expanded(
               child: _RatingButton(
                 icon: Icons.check,
-                label: 'Good',
+                label: context.l10n.learnRatingGood,
                 rating: fsrs.Rating.good,
                 onRate: onRate,
                 enabled: enabled,
@@ -381,7 +380,7 @@ class _RatingButtons extends StatelessWidget {
             Expanded(
               child: _RatingButton(
                 icon: Icons.trending_up,
-                label: 'Easy',
+                label: context.l10n.learnRatingEasy,
                 rating: fsrs.Rating.easy,
                 onRate: onRate,
                 enabled: enabled,

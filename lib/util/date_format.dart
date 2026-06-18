@@ -4,16 +4,38 @@
 // - 日期格式化(formatAbsoluteDate / formatRelative)
 // - local-time 的 "start of day" 算术(startOfLocalDay / startOfNextLocalDay)
 
-/// 将任意 [DateTime] 转为本地时区并格式化为 `YYYY/MM/DD`。
+import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
+
+import 'context_l10n.dart';
+
+/// Convert a [BuildContext]'s [Locale] to the POSIX underscore form that
+/// `intl.DateFormat` expects (e.g. `zh_CN`, `en_US`).
+///
+/// `Localizations.localeOf(context).toLanguageTag()` returns BCP47
+/// (`zh-Hans-CN`); `intl.DateFormat` does NOT understand the script
+/// segment, so a script-bearing tag like `zh-Hans-CN` falls back to
+/// default formatting. Manual concat avoids that.
+String _localeTag(BuildContext context) {
+  final l = Localizations.localeOf(context);
+  if (l.countryCode != null && l.countryCode!.isNotEmpty) {
+    return '${l.languageCode}_${l.countryCode}';
+  }
+  return l.languageCode;
+}
+
+/// 将任意 [DateTime] 转为本地时区并按当前 locale 格式化为日期。
 ///
 /// 对已经是 local time 的 [DateTime] 是 no-op;对 UTC [DateTime] 会先
 /// 转换时区。参数名刻意不用 `utc`,因为函数对两种输入都正确 —— 调用方
 /// 不需要先做时区分拣。
-String formatAbsoluteDate(DateTime dt) {
+///
+/// 注意:en 之外的 locale 需要在 `main()` 里先
+/// `await initializeDateFormatting('<lang>_<country>')`,否则
+/// `DateFormat.yMd` 会抛 / 兜底到 en 格式。0.1.0 仅 en,无需此调用。
+String formatAbsoluteDate(BuildContext context, DateTime dt) {
   final l = dt.toLocal();
-  final m = l.month.toString().padLeft(2, '0');
-  final d = l.day.toString().padLeft(2, '0');
-  return '${l.year}/$m/$d';
+  return DateFormat.yMd(_localeTag(context)).format(l);
 }
 
 /// Returns the start of the local day for [source] (defaults to now).
@@ -37,18 +59,22 @@ DateTime startOfNextLocalDay([DateTime? source]) {
   return DateTime(d.year, d.month, d.day + 1);
 }
 
-/// 将 UTC [DateTime] 渲染为相对时间描述。
+/// 将 UTC [DateTime] 渲染为相对时间描述,使用当前 locale 翻译。
 ///
-/// - 同一分钟内 → `'now'`
-/// - 同一天 → `'just now'`
-/// - 未来 → `'in N day(s)'`
-/// - 过去 → `'overdue by N day(s)'`
+/// - 同一分钟内 → `relativeNow`
+/// - 同一天 → `relativeJustNow`
+/// - 未来 → `relativeInDays`
+/// - 过去 → `relativeOverdueDays`
 ///
 /// [now] 参数仅用于测试入口;生产代码不传,默认取 `DateTime.now()`。
-String formatRelative(DateTime utc, {DateTime? now}) {
+String formatRelative(
+  BuildContext context,
+  DateTime utc, {
+  DateTime? now,
+}) {
   final n = (now ?? DateTime.now()).toUtc();
   final diff = utc.difference(n);
-  if (diff.inSeconds.abs() < 60) return 'now';
+  if (diff.inSeconds.abs() < 60) return context.l10n.relativeNow;
   // FIXME(review#6): Duration.inDays 只返回整天数。duration 落在 (−24h, 0)
   // 或 (0, +24h) 时都被折叠成 days == 0 → 'just now'。结果:一张 23h overdue
   // 的卡片显示 "just now" 而不是 "overdue by 1 day",23h 后的新 due 也只
@@ -59,8 +85,8 @@ String formatRelative(DateTime utc, {DateTime? now}) {
   // 24h 改为 (24h − 1min) 让 23h59m 算 1 day。语义取决于你想表达什么
   // —— "just now" 应该非常短(< 几小时),还是"同日"(< 24h)。
   final days = diff.inDays;
-  if (days == 0) return 'just now';
-  if (days > 0) return 'in $days day${days == 1 ? '' : 's'}';
+  if (days == 0) return context.l10n.relativeJustNow;
+  if (days > 0) return context.l10n.relativeInDays(days);
   final overdue = -days;
-  return 'overdue by $overdue day${overdue == 1 ? '' : 's'}';
+  return context.l10n.relativeOverdueDays(overdue);
 }
