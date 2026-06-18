@@ -6,6 +6,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:logging/logging.dart' as logging;
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
@@ -44,6 +45,14 @@ void main() async {
   final schedulerRepository = SchedulerRepository();
   final appDatabase = AppDatabase();
   final aiService = AIService(preferencesRepository);
+
+  // Register date-formatting locale data for the Chinese variants we ship.
+  // Must run before runApp so DateFormat can resolve these locales.
+  // (lib/util/date_format.dart converts BuildContext to POSIX form zh_CN / zh_TW / zh_HK.)
+  await initializeDateFormatting('zh_CN');
+  await initializeDateFormatting('zh_TW');
+  await initializeDateFormatting('zh_HK');
+
   runApp(
     WorderApp(
       savedThemeMode: savedThemeMode,

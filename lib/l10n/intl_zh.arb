@@ -3,5 +3,553 @@
   "appTitle": "缀字",
   "@appTitle": {
     "description": "Application display name shown in the title bar, the Android launcher (via strings.xml), and system task switchers."
+  },
+  "appSlogan": "每字一步，更近一步。",
+  "@appSlogan": {
+    "description": "Short motivational tagline used as the default app slogan in marketing and about screens."
+  },
+  "navDashboard": "主页",
+  "@navDashboard": {
+    "description": "Bottom NavigationBar tab label for the dashboard (home) screen."
+  },
+  "navLibrary": "词库",
+  "@navLibrary": {
+    "description": "Bottom NavigationBar tab label for the word library screen."
+  },
+  "navSettings": "设置",
+  "@navSettings": {
+    "description": "Bottom NavigationBar tab label for the settings page."
+  },
+  "navNewWordTooltip": "新建单词",
+  "@navNewWordTooltip": {
+    "description": "FloatingActionButton tooltip on the dashboard and library tabs. Tapping opens the Add Word page."
+  },
+  "dashboardSlogan": "每字一步，更近一步。",
+  "@dashboardSlogan": {
+    "description": "Dashboard header tagline displayed under the Worder brand title."
+  },
+  "dashboardDayCounter": "{days, plural, =0{刚开始} =1{第一天} other{第 {days} 天}}",
+  "@dashboardDayCounter": {
+    "description": "Streak counter shown under the dashboard date. Shows the number of consecutive days the user has opened the app. Uses ICU plural so translators can customise the form for 0/1/other counts.",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "dashboardStatNeedToReview": "待复习",
+  "@dashboardStatNeedToReview": {
+    "description": "Label of the left status card on the dashboard. Shows the count of words currently due for FSRS review."
+  },
+  "dashboardStatReviewedToday": "今日已复习",
+  "@dashboardStatReviewedToday": {
+    "description": "Label of the right status card on the dashboard. Shows how many words the user has reviewed since local midnight."
+  },
+  "dashboardReviewButton": "复习",
+  "@dashboardReviewButton": {
+    "description": "Primary button on the dashboard that starts an FSRS review session for due words."
+  },
+  "dashboardLearnButton": "学习",
+  "@dashboardLearnButton": {
+    "description": "Primary button on the dashboard that starts a learn session for new (or relearning) words."
+  },
+  "dashboardRecentlyReviewed": "最近复习",
+  "@dashboardRecentlyReviewed": {
+    "description": "Section header above the list of the most recently reviewed words on the dashboard."
+  },
+  "dashboardErrorCouldNotLoadReviewStatus": "无法加载复习状态",
+  "@dashboardErrorCouldNotLoadReviewStatus": {
+    "description": "Toast message shown when the dashboard fails to load the count of words due for review (typically before opening the Learn dialog)."
+  },
+  "dashboardErrorCouldNotLoadLearningWords": "无法加载待学习单词",
+  "@dashboardErrorCouldNotLoadLearningWords": {
+    "description": "Toast message shown when the Learn button fails to load the batch of new words."
+  },
+  "dashboardErrorCouldNotLoadReviewWords": "无法加载待复习单词",
+  "@dashboardErrorCouldNotLoadReviewWords": {
+    "description": "Toast message shown when the Review button fails to load the batch of due words."
+  },
+  "dashboardErrorCouldNotLoadRecentReviews": "无法加载最近复习记录。",
+  "@dashboardErrorCouldNotLoadRecentReviews": {
+    "description": "Inline error message inside the 'Recently reviewed' section when its stream emits an error."
+  },
+  "dashboardEmptyNoReviewedYet": "还没有复习过的单词。",
+  "@dashboardEmptyNoReviewedYet": {
+    "description": "Inline empty-state message for the 'Recently reviewed' section when the user has not reviewed any words yet."
+  },
+  "dashboardDialogReviewFirstTitle": "还有单词待复习",
+  "@dashboardDialogReviewFirstTitle": {
+    "description": "Title of the dialog shown when the user taps Learn while there are still words due for review. Encourages reviewing first."
+  },
+  "dashboardDialogReviewFirstMessage": "{dueCount} {dueCount, plural, =1{个单词待复习} other{个单词待复习}}。先复习，还是继续学习？",
+  "@dashboardDialogReviewFirstMessage": {
+    "description": "Body of the 'Review work waiting' dialog. Uses ICU plural to choose 'word'/'words' and 'is'/'are' based on the number of due reviews.",
+    "placeholders": {
+      "dueCount": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "dashboardDialogReviewFirstOk": "去复习",
+  "@dashboardDialogReviewFirstOk": {
+    "description": "OK button label of the 'Review work waiting' dialog. Switches to a review session."
+  },
+  "dashboardDialogReviewFirstCancel": "继续学习",
+  "@dashboardDialogReviewFirstCancel": {
+    "description": "Cancel button label of the 'Review work waiting' dialog. Proceeds with the original Learn session."
+  },
+  "dashboardDialogNoNewWordsTitle": "暂无新单词",
+  "@dashboardDialogNoNewWordsTitle": {
+    "description": "Title of the dialog shown when the user taps Learn but no new or relearning words are available."
+  },
+  "dashboardDialogNoNewWordsMessage": "现在没有可学习的新单词。先去添加几个吧！",
+  "@dashboardDialogNoNewWordsMessage": {
+    "description": "Body of the 'No new words yet' dialog, encouraging the user to add new words."
+  },
+  "dashboardDialogAllCaughtUpTitle": "全部复习完啦！",
+  "@dashboardDialogAllCaughtUpTitle": {
+    "description": "Title of the dialog shown when the user taps Review but no words are due. Celebratory tone."
+  },
+  "dashboardDialogAllCaughtUpMessage": "现在没有需要复习的单词。去学几个新词吧！",
+  "@dashboardDialogAllCaughtUpMessage": {
+    "description": "Body of the 'All caught up!' dialog, nudging the user to add new words."
+  },
+  "addWordAppBarTitle": "新建单词",
+  "@addWordAppBarTitle": {
+    "description": "AppBar title of the Add Word full-screen page."
+  },
+  "addWordFieldWord": "单词",
+  "@addWordFieldWord": {
+    "description": "Label for the word input field on the Add Word form. Reused in the AI Enhance sheet for the same field."
+  },
+  "addWordFieldPinyin": "拼音",
+  "@addWordFieldPinyin": {
+    "description": "Label for the pinyin input field on the Add Word form. Reused in the AI Enhance sheet for the same field."
+  },
+  "addWordFieldMeaning": "释义",
+  "@addWordFieldMeaning": {
+    "description": "Label for the meaning/definition input field on the Add Word form. Reused in the AI Enhance sheet for the same field."
+  },
+  "addWordFieldNote": "备注（选填）",
+  "@addWordFieldNote": {
+    "description": "Label for the optional notes input field on the Add Word form. The '(optional)' suffix signals the field is not required."
+  },
+  "addWordAiEnhanceButton": "AI 增强",
+  "@addWordAiEnhanceButton": {
+    "description": "Outlined button on the Add Word bottom bar that opens the AI Enhance sheet to auto-fill pinyin, meaning, and notes."
+  },
+  "addWordConfirmButton": "确认",
+  "@addWordConfirmButton": {
+    "description": "Primary filled button on the Add Word bottom bar. Opens a save confirmation dialog before persisting the new word."
+  },
+  "addWordSaveDialogTitle": "保存这个单词？",
+  "@addWordSaveDialogTitle": {
+    "description": "Title of the save confirmation dialog on the Add Word page."
+  },
+  "addWordSaveDialogMessage": "将创建一个新单词条目。",
+  "@addWordSaveDialogMessage": {
+    "description": "Body of the save confirmation dialog on the Add Word page."
+  },
+  "addWordSaveDialogOk": "保存",
+  "@addWordSaveDialogOk": {
+    "description": "OK button label of the save confirmation dialog on the Add Word page."
+  },
+  "addWordSaveDialogCancel": "取消",
+  "@addWordSaveDialogCancel": {
+    "description": "Cancel button label of the save confirmation dialog on the Add Word page."
+  },
+  "addWordToastSaveSuccess": "已保存",
+  "@addWordToastSaveSuccess": {
+    "description": "Toast message shown after a new word is persisted successfully. The form is then cleared for batch entry."
+  },
+  "addWordToastSaveError": "保存失败",
+  "@addWordToastSaveError": {
+    "description": "Toast message shown when persisting a new word fails. The form is left intact for retry."
+  },
+  "addWordEnhanceLoading": "AI 正在增强单词信息…",
+  "@addWordEnhanceLoading": {
+    "description": "Loading text shown inside the AI Enhance sheet while waiting for the LLM to return pinyin/meaning/notes."
+  },
+  "addWordEnhanceErrorClose": "关闭",
+  "@addWordEnhanceErrorClose": {
+    "description": "Button label in the AI Enhance sheet's error state. Dismisses the sheet."
+  },
+  "addWordEnhanceRegenerateTooltip": "重新生成",
+  "@addWordEnhanceRegenerateTooltip": {
+    "description": "IconButton tooltip in the AI Enhance sheet. Re-asks the LLM for that single field (pinyin, meaning, or note)."
+  },
+  "addWordEnhanceRestoreTooltip": "恢复原值",
+  "@addWordEnhanceRestoreTooltip": {
+    "description": "IconButton tooltip in the AI Enhance sheet. Reverts that field to whatever the user typed before the LLM filled it in."
+  },
+  "addWordEnhanceRegenerateAll": "全部重新生成",
+  "@addWordEnhanceRegenerateAll": {
+    "description": "Outlined button label in the AI Enhance sheet. Re-asks the LLM for pinyin, meaning, and notes in one go."
+  },
+  "addWordEnhanceCancel": "取消",
+  "@addWordEnhanceCancel": {
+    "description": "Outlined button label in the AI Enhance sheet. Discards AI suggestions and closes the sheet."
+  },
+  "addWordEnhanceConfirm": "确认",
+  "@addWordEnhanceConfirm": {
+    "description": "Primary button label in the AI Enhance sheet. Copies the AI-suggested pinyin/meaning/note back into the Add Word form."
+  },
+  "libraryToastDeleteSuccess": "已删除",
+  "@libraryToastDeleteSuccess": {
+    "description": "Toast message shown after a word is successfully deleted from the library."
+  },
+  "libraryToastDeleteError": "删除失败",
+  "@libraryToastDeleteError": {
+    "description": "Toast message shown when deleting a word from the library fails."
+  },
+  "libraryDialogDeleteTitle": "删除这个单词？",
+  "@libraryDialogDeleteTitle": {
+    "description": "Title of the long-press delete confirmation dialog on the library page."
+  },
+  "libraryDialogDeleteMessage": "「{word}」将从你的词库中移除，且无法撤销。",
+  "@libraryDialogDeleteMessage": {
+    "description": "Body of the delete confirmation dialog. Includes the word's text in double quotes and warns the action is irreversible.",
+    "placeholders": {
+      "word": {
+        "type": "String",
+        "example": "serendipity"
+      }
+    }
+  },
+  "libraryDialogDeleteOk": "删除",
+  "@libraryDialogDeleteOk": {
+    "description": "OK button label of the library delete confirmation dialog."
+  },
+  "libraryDialogDeleteCancel": "取消",
+  "@libraryDialogDeleteCancel": {
+    "description": "Cancel button label of the library delete confirmation dialog."
+  },
+  "libraryErrorLoadTitle": "词库加载失败",
+  "@libraryErrorLoadTitle": {
+    "description": "Heading of the error state on the library page when the words stream fails."
+  },
+  "libraryErrorRetry": "重试",
+  "@libraryErrorRetry": {
+    "description": "Button label in the library error state. Re-subscribes to the words stream."
+  },
+  "libraryEmptyTitle": "词库空空如也",
+  "@libraryEmptyTitle": {
+    "description": "Heading of the empty state on the library page when the user has no words saved yet."
+  },
+  "libraryEmptyMessage": "添加第一个单词，开始你的收藏",
+  "@libraryEmptyMessage": {
+    "description": "Subtext of the library empty state, encouraging the user to add their first word."
+  },
+  "libraryEmptyAddButton": "添加单词",
+  "@libraryEmptyAddButton": {
+    "description": "Primary button label in the library empty state. Navigates to the Add Word page."
+  },
+  "libraryActionsDelete": "删除",
+  "@libraryActionsDelete": {
+    "description": "Title of the destructive 'Delete' ListTile in the per-card actions bottom sheet on the library page. Separate key from the dialog confirm button so the sheet can be styled as destructive without forcing the dialog button to be styled the same way."
+  },
+  "settingsSectionTheme": "主题",
+  "@settingsSectionTheme": {
+    "description": "Section heading on the settings page that groups the theme SegmentedButton."
+  },
+  "settingsThemeLight": "浅色",
+  "@settingsThemeLight": {
+    "description": "Segment label that forces the light theme."
+  },
+  "settingsThemeDark": "深色",
+  "@settingsThemeDark": {
+    "description": "Segment label that forces the dark theme."
+  },
+  "settingsThemeSystem": "跟随系统",
+  "@settingsThemeSystem": {
+    "description": "Segment label that follows the OS theme preference."
+  },
+  "settingsSectionAiConfig": "AI 配置",
+  "@settingsSectionAiConfig": {
+    "description": "Section heading on the settings page that groups the LLM config fields (base URL, API key, model)."
+  },
+  "settingsAiConfigDescription": "仅支持 OpenAI 兼容接口。",
+  "@settingsAiConfigDescription": {
+    "description": "Subtitle below the AI Configuration section heading, clarifying that only OpenAI-compatible LLM endpoints are valid."
+  },
+  "settingsFieldBaseUrl": "Base URL",
+  "@settingsFieldBaseUrl": {
+    "description": "Label for the Base URL input field in AI Configuration. Typically an OpenAI-compatible endpoint root (e.g. https://api.openai.com/v1)."
+  },
+  "settingsFieldApiKey": "API Key",
+  "@settingsFieldApiKey": {
+    "description": "Label for the API key input field in AI Configuration. The field is rendered as a password (obscured)."
+  },
+  "settingsFieldApiKeyHelper": "已隐藏以保护隐私",
+  "@settingsFieldApiKeyHelper": {
+    "description": "Helper text under the API key field, reassuring the user that the key is obscured in the UI."
+  },
+  "settingsFieldModel": "模型",
+  "@settingsFieldModel": {
+    "description": "Label for the model name input field in AI Configuration (e.g. gpt-4o-mini, qwen2.5:7b)."
+  },
+  "settingsTestButton": "测试",
+  "@settingsTestButton": {
+    "description": "Label of the FilledButton that fires AIService.testConnection() and toasts the result."
+  },
+  "settingsToastSaveError": "保存设置失败",
+  "@settingsToastSaveError": {
+    "description": "Toast message shown when persisting the LLM config (debounced auto-save) fails."
+  },
+  "settingsToastTestSuccess": "连接成功",
+  "@settingsToastTestSuccess": {
+    "description": "Toast message shown after AIService.testConnection() succeeds."
+  },
+  "settingsToastTestUnexpectedError": "测试失败：发生未知错误",
+  "@settingsToastTestUnexpectedError": {
+    "description": "Toast message shown when AIService.testConnection() throws something that is not an LLMException."
+  },
+  "learnHeaderProgressCounter": "{reviewed} / {total}",
+  "@learnHeaderProgressCounter": {
+    "description": "Small header text on the Learn / Review session page showing how many of the session's words have been rated.",
+    "placeholders": {
+      "reviewed": {
+        "type": "int",
+        "example": "3"
+      },
+      "total": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  "learnBackTooltip": "退出本轮",
+  "@learnBackTooltip": {
+    "description": "Tooltip of the back-arrow IconButton in the Learn / Review session AppBar. Opens a quit-confirmation dialog."
+  },
+  "learnRevealButton": "揭晓",
+  "@learnRevealButton": {
+    "description": "Label of the front-of-card button that flips the card to show pinyin/meaning/notes. After tapping, it is replaced by the FSRS rating grid."
+  },
+  "learnRatingAgain": "重来",
+  "@learnRatingAgain": {
+    "description": "FSRS rating button label meaning 'failed recall — show again soon'. Maps to fsrs.Rating.again."
+  },
+  "learnRatingHard": "困难",
+  "@learnRatingHard": {
+    "description": "FSRS rating button label meaning 'recalled with significant difficulty'. Maps to fsrs.Rating.hard."
+  },
+  "learnRatingGood": "良好",
+  "@learnRatingGood": {
+    "description": "FSRS rating button label meaning 'recalled correctly'. Maps to fsrs.Rating.good."
+  },
+  "learnRatingEasy": "简单",
+  "@learnRatingEasy": {
+    "description": "FSRS rating button label meaning 'recalled with no effort'. Maps to fsrs.Rating.easy."
+  },
+  "learnToastRateError": "评分记录失败",
+  "@learnToastRateError": {
+    "description": "Toast message shown when persisting a rating via LearningSessionManager.rateWord fails. The back of the card stays put for retry."
+  },
+  "learnDialogQuitTitle": "退出本轮？",
+  "@learnDialogQuitTitle": {
+    "description": "Title of the quit-confirmation dialog shown when the user tries to leave a Learn / Review session early."
+  },
+  "learnDialogQuitMessage": "已复习的单词已保存。剩余队列将丢失。",
+  "@learnDialogQuitMessage": {
+    "description": "Body of the quit-confirmation dialog. Explains that already-rated words are persisted but the rest of the queue is discarded."
+  },
+  "learnDialogQuitOk": "退出",
+  "@learnDialogQuitOk": {
+    "description": "OK button label of the quit-confirmation dialog. Exits the session and returns to the dashboard."
+  },
+  "learnDialogQuitCancel": "继续",
+  "@learnDialogQuitCancel": {
+    "description": "Cancel button label of the quit-confirmation dialog. Returns to the session."
+  },
+  "sessionCompleteTitle": "本轮完成！",
+  "@sessionCompleteTitle": {
+    "description": "Heading on the post-session summary page after the queue is exhausted."
+  },
+  "sessionCompleteCounter": "{reviewedCount} {reviewedCount, plural, =1{个单词已复习。} other{个单词已复习。}}",
+  "@sessionCompleteCounter": {
+    "description": "Subtext on the post-session summary page. Shows the total number of words reviewed in this session. Uses ICU plural for word/words inflection.",
+    "placeholders": {
+      "reviewedCount": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "sessionCompleteBack": "返回主页",
+  "@sessionCompleteBack": {
+    "description": "Primary button label on the post-session summary page. Returns to the dashboard tab."
+  },
+  "wordDetailSectionStats": "记忆数据",
+  "@wordDetailSectionStats": {
+    "description": "Section header on the word detail page for the FSRS memory statistics (recall, difficulty, stability, timeline)."
+  },
+  "wordDetailSectionNotes": "笔记",
+  "@wordDetailSectionNotes": {
+    "description": "Section header on the word detail page for the user's notes attached to this word."
+  },
+  "wordDetailFabTooltip": "新建笔记",
+  "@wordDetailFabTooltip": {
+    "description": "FloatingActionButton tooltip on the word detail page. Opens the note editor sheet."
+  },
+  "wordDetailTimelineCreated": "创建时间",
+  "@wordDetailTimelineCreated": {
+    "description": "Label of the timeline cell showing when the word was first added to the library."
+  },
+  "wordDetailTimelineLastReview": "上次复习",
+  "@wordDetailTimelineLastReview": {
+    "description": "Label of the timeline cell showing the most recent review time. Shows 'Never' if the word has never been reviewed."
+  },
+  "wordDetailTimelineLastReviewNever": "从未复习",
+  "@wordDetailTimelineLastReviewNever": {
+    "description": "Placeholder value for the 'Last review' timeline cell when the word has not been reviewed yet."
+  },
+  "wordDetailTimelineNextDue": "下次复习",
+  "@wordDetailTimelineNextDue": {
+    "description": "Label of the timeline cell showing when the word is next due for review (FSRS due date)."
+  },
+  "wordDetailMemoryRecall": "回忆概率",
+  "@wordDetailMemoryRecall": {
+    "description": "Label of the memory stats cell showing the FSRS recall probability as a percentage."
+  },
+  "wordDetailMemoryDifficulty": "难度",
+  "@wordDetailMemoryDifficulty": {
+    "description": "Label of the memory stats cell showing the FSRS difficulty value (1.0–10.0 range, formatted to 1 decimal)."
+  },
+  "wordDetailMemoryStability": "稳定性",
+  "@wordDetailMemoryStability": {
+    "description": "Label of the memory stats cell showing the FSRS stability value in days, with a 'd' suffix."
+  },
+  "wordDetailMemoryPlaceholder": "评分后即可查看记忆数据",
+  "@wordDetailMemoryPlaceholder": {
+    "description": "Placeholder message shown in the memory stats section when the word has not been reviewed yet — no stats exist to display."
+  },
+  "wordDetailNotesEmpty": "暂无笔记",
+  "@wordDetailNotesEmpty": {
+    "description": "Message shown inside the Notes section card when the word has no notes."
+  },
+  "wordDetailNoteEdit": "编辑",
+  "@wordDetailNoteEdit": {
+    "description": "Title of the 'Edit' ListTile in the per-note actions bottom sheet on the word detail page."
+  },
+  "wordDetailNoteMoveToTop": "置顶",
+  "@wordDetailNoteMoveToTop": {
+    "description": "Title of the 'Move to top' ListTile in the per-note actions bottom sheet."
+  },
+  "wordDetailNoteDelete": "删除",
+  "@wordDetailNoteDelete": {
+    "description": "Title of the destructive 'Delete' ListTile in the per-note actions bottom sheet on the word detail page."
+  },
+  "wordDetailNoteEditorHint": "写下你的笔记...",
+  "@wordDetailNoteEditorHint": {
+    "description": "Placeholder hint text inside the TextField of the note editor bottom sheet."
+  },
+  "wordDetailNoteEditorCancel": "取消",
+  "@wordDetailNoteEditorCancel": {
+    "description": "Cancel button label in the note editor bottom sheet. Discards the new/edited note."
+  },
+  "wordDetailNoteEditorSave": "保存",
+  "@wordDetailNoteEditorSave": {
+    "description": "Save button label in the note editor bottom sheet. Persists the new/edited note."
+  },
+  "wordDetailNoteSaveError": "保存笔记失败",
+  "@wordDetailNoteSaveError": {
+    "description": "Toast message shown when persisting a new or edited note fails."
+  },
+  "aiErrorNotConfigured": "AI 尚未配置。请先填写 Base URL、Model、API Key。",
+  "@aiErrorNotConfigured": {
+    "description": "LLMException message shown when the user invokes an AI feature before saving a complete LLMConfig (base URL, model, API key all required)."
+  },
+  "aiErrorInvalidKey": "API Key 无效（401）。请检查密钥是否正确。",
+  "@aiErrorInvalidKey": {
+    "description": "LLMException message shown when the LLM endpoint returns HTTP 401 (authentication failure)."
+  },
+  "aiErrorModelNotFound": "模型不存在（404）。请检查模型名称，并确认 {baseURL} 提供的是 OpenAI 兼容接口。（服务端信息：{message}）",
+  "@aiErrorModelNotFound": {
+    "description": "LLMException message shown when the LLM endpoint returns HTTP 404 (model not found, or endpoint is not OpenAI-compatible).",
+    "placeholders": {
+      "baseURL": {
+        "type": "String",
+        "example": "https://api.openai.com/v1"
+      },
+      "message": {
+        "type": "String",
+        "example": "model 'gpt-5' not found"
+      }
+    }
+  },
+  "aiErrorRequestTimeout": "请求超时（{minutes} 分钟）。请检查 Base URL 是否可达。",
+  "@aiErrorRequestTimeout": {
+    "description": "LLMException message shown when the LLM request exceeds the 10-minute timeout. Usually indicates a network/proxy issue.",
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  "aiErrorCannotReach": "无法连接 {baseURL}。请检查地址和网络。",
+  "@aiErrorCannotReach": {
+    "description": "LLMException message shown when the LLM endpoint is unreachable (DNS failure, refused connection, etc.).",
+    "placeholders": {
+      "baseURL": {
+        "type": "String",
+        "example": "http://localhost:11434/v1"
+      }
+    }
+  },
+  "aiErrorGeneric": "AI 出错：{message}",
+  "@aiErrorGeneric": {
+    "description": "LLMException catch-all message for any other library-thrown error (400/403/409/422/429/5xx, parse errors, etc.).",
+    "placeholders": {
+      "message": {
+        "type": "String",
+        "example": "rate limit exceeded"
+      }
+    }
+  },
+  "aiErrorUnexpectedFormat": "AI 返回的格式异常，请重试。",
+  "@aiErrorUnexpectedFormat": {
+    "description": "EnhanceError message shown when the AI Enhance sheet receives a response that doesn't match the expected pinyin/meaning/notes structure (FormatException)."
+  },
+  "aiErrorUnknown": "AI 未知错误：{message}",
+  "@aiErrorUnknown": {
+    "description": "EnhanceError catch-all message for any non-LLMException thrown by the AI Enhancer. Kept separate from aiErrorGeneric so translators can adjust phrasing.",
+    "placeholders": {
+      "message": {
+        "type": "String",
+        "example": "rate limit exceeded"
+      }
+    }
+  },
+  "relativeNow": "刚刚",
+  "@relativeNow": {
+    "description": "Relative-time label for timestamps within 60 seconds of 'now'. Used in word detail and dashboard."
+  },
+  "relativeJustNow": "今天早些时候",
+  "@relativeJustNow": {
+    "description": "Relative-time label for timestamps earlier today (UTC day boundary)."
+  },
+  "relativeInDays": "{days} {days, plural, =1{天后} other{天后}}",
+  "@relativeInDays": {
+    "description": "Relative-time label for future dates. Uses ICU plural for day/days inflection.",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "relativeOverdueDays": "已逾期 {overdue} {overdue, plural, =1{天} other{天}}",
+  "@relativeOverdueDays": {
+    "description": "Relative-time label for past dates past the UTC day boundary. Uses ICU plural for day/days inflection.",
+    "placeholders": {
+      "overdue": {
+        "type": "int",
+        "example": "2"
+      }
+    }
   }
 }
