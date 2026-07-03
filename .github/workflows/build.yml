@@ -92,7 +92,11 @@ jobs:
       - name: Package Windows build
         shell: bash
         run: |
-          WIN_DIR="build/windows/runner/Release"
+          # 更兼容的路径检查
+          WIN_DIR="build/windows/x64/runner/Release"
+          if [ ! -d "$WIN_DIR" ]; then
+            WIN_DIR="build/windows/runner/Release"
+          fi
           if [ -d "$WIN_DIR" ]; then
             VERSION="${{ steps.version.outputs.version }}"
             TS="${{ steps.timestamp.outputs.timestamp }}"
