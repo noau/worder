@@ -224,20 +224,13 @@ class _WordInfoArea extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 8,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.ideographic,
-          spacing: 4,
-          children: [
-            Text(word.word, style: theme.textTheme.displayLarge),
-            Text(
-              word.pinyin,
-              style: theme.textTheme.displayMedium?.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
-            ),
-          ],
+        _WordHeadline(
+          word: word.word,
+          pinyin: word.pinyin,
+          wordStyle: theme.textTheme.displayLarge,
+          pinyinStyle: theme.textTheme.displayMedium?.copyWith(
+            color: colors.onSurfaceVariant,
+          ),
         ),
         Text(
           word.meaning,
@@ -248,6 +241,87 @@ class _WordInfoArea extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+/// Word + pinyin 的标题行,长 word / 长 pinyin 不会横向溢出。
+///
+/// 默认情况下保持与原本 `Row(... baseline, ideographic)` 一致的视觉
+/// (单词 + 拼音同行,baseline 对齐)。当 word + pinyin 在当前 display 尺寸下
+/// 的自然总宽超过父容器可用宽度时,降级为纵向 Column(word 在上,pinyin 在下):
+/// 这样能保留 word 的"主标题"视觉层级,同时把拼音放到次级位置,避免溢出。
+/// pinyin 单条仍超出可用宽度时再用 `FittedBox.scaleDown` 兜底。
+class _WordHeadline extends StatelessWidget {
+  const _WordHeadline({
+    required this.word,
+    required this.pinyin,
+    required this.wordStyle,
+    required this.pinyinStyle,
+  });
+
+  final String word;
+  final String pinyin;
+  final TextStyle? wordStyle;
+  final TextStyle? pinyinStyle;
+
+  /// 横向布局时 word 与 pinyin 之间的间距(对齐原 Row spacing)。
+  static const double _hGap = 4;
+
+  /// 纵向降级布局时 word 与 pinyin 之间的间距。
+  static const double _vGap = 2;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxWidth = constraints.maxWidth;
+        final wordWidth = _measureTextWidth(word, wordStyle);
+        final pinyinWidth = _measureTextWidth(pinyin, pinyinStyle);
+        // 正常 case:word + pinyin 总宽塞得下,保留原 baseline 对齐 Row,
+        // 视觉与改动前字节一致。
+        if (wordWidth + _hGap + pinyinWidth <= maxWidth) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.ideographic,
+            spacing: _hGap,
+            children: [
+              Text(word, style: wordStyle),
+              Text(pinyin, style: pinyinStyle),
+            ],
+          );
+        }
+        // 溢出 case:纵向堆叠。word 走 Text 默认 softWrap(超长 word 自然
+        // 换行),pinyin 单独超宽时再用 FittedBox.scaleDown 兜底,保证不出格。
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: _vGap,
+          children: [
+            Text(word, style: wordStyle),
+            if (pinyinWidth <= maxWidth)
+              Text(pinyin, style: pinyinStyle)
+            else
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(pinyin, style: pinyinStyle),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// 量出 text 在给定 style 下的自然单行宽度。
+  /// style 允许为 null,与 `Text` 渲染时的行为一致。
+  double _measureTextWidth(String text, TextStyle? style) {
+    final painter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    final width = painter.width;
+    painter.dispose();
+    return width;
   }
 }
 
@@ -564,19 +638,13 @@ class _NoteActionsSheet extends StatelessWidget {
           // Header: 显示父 word 让用户知道操作的是哪条 word 的 note
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.ideographic,
-              spacing: 4,
-              children: [
-                Text(word.word, style: theme.textTheme.titleLarge),
-                Text(
-                  word.pinyin,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colors.onSurfaceVariant,
-                  ),
-                ),
-              ],
+            child: _WordHeadline(
+              word: word.word,
+              pinyin: word.pinyin,
+              wordStyle: theme.textTheme.titleLarge,
+              pinyinStyle: theme.textTheme.titleMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
             ),
           ),
           const Divider(height: 1),
@@ -704,19 +772,13 @@ class _NoteEditorSheetState extends State<_NoteEditorSheet> {
           children: [
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.ideographic,
-                spacing: 4,
-                children: [
-                  Text(widget.word.word, style: theme.textTheme.displayMedium),
-                  Text(
-                    widget.word.pinyin,
-                    style: theme.textTheme.displaySmall?.copyWith(
-                      color: colors.onSurfaceVariant,
-                    ),
-                  ),
-                ],
+              child: _WordHeadline(
+                word: widget.word.word,
+                pinyin: widget.word.pinyin,
+                wordStyle: theme.textTheme.displayMedium,
+                pinyinStyle: theme.textTheme.displaySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
               ),
             ),
             TextField(

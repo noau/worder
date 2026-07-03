@@ -149,6 +149,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addWordToastSaveError => 'Failed to save the word';
 
   @override
+  String get addWordDuplicateWarning => 'This word is already in your library';
+
+  @override
+  String get addWordDuplicateDialogTitle => 'Duplicate Word';
+
+  @override
+  String addWordDuplicateDialogMessage(String word) {
+    return 'The word \"$word\" is already in your library. Do you want to add it again?';
+  }
+
+  @override
+  String get addWordDuplicateDialogOk => 'Add anyway';
+
+  @override
+  String get addWordDuplicateDialogCancel => 'Cancel';
+
+  @override
   String get addWordEnhanceLoading => 'Asking the AI to enhance your word…';
 
   @override

@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:worder/config.dart';
 import 'package:worder/database.dart';
 import 'package:worder/entity/word_model.dart';
 import 'package:worder/manager/ai_enhancer.dart';
@@ -34,6 +37,14 @@ class _AddWordPageState extends State<AddWordPage> {
   late final AIService _aiService;
   late final bool _aiConfigured;
 
+  late final AppDatabase _db;
+
+  /// Drives the yellow `helperText` + amber `suffixIcon` decoration on the
+  /// Word field. Updated by [_onWordChangedForDup] after a debounced
+  /// [AppDatabase.getWordExists] query.
+  late final ValueNotifier<bool> _isDuplicate;
+  Timer? _dupDebounce;
+
   @override
   void initState() {
     super.initState();
@@ -45,13 +56,18 @@ class _AddWordPageState extends State<AddWordPage> {
     _canConfirm = ValueNotifier(false);
     _aiService = context.read<AIService>();
     _aiConfigured = _aiService.isConfigured;
+    _db = context.read<AppDatabase>();
+    _isDuplicate = ValueNotifier(false);
     _wordCtrl.addListener(_updateButtons);
     _pinyinCtrl.addListener(_updateButtons);
     _meaningCtrl.addListener(_updateButtons);
+    _wordCtrl.addListener(_onWordChangedForDup);
   }
 
   @override
   void dispose() {
+    _dupDebounce?.cancel();
+    _isDuplicate.dispose();
     _wordCtrl.dispose();
     _pinyinCtrl.dispose();
     _meaningCtrl.dispose();
@@ -70,7 +86,27 @@ class _AddWordPageState extends State<AddWordPage> {
         _isFilled(_meaningCtrl);
   }
 
+  /// Debounced duplicate-check listener. Restarts the timer on every
+  /// keystroke; the actual `getWordExists` query only runs after
+  /// [kDuplicateCheckDebounce] of inactivity. Empty / whitespace-only input
+  /// short-circuits to `false` without a query.
+  void _onWordChangedForDup() {
+    _dupDebounce?.cancel();
+    final trimmed = _wordCtrl.text.trim();
+    if (trimmed.isEmpty) {
+      _isDuplicate.value = false;
+      return;
+    }
+    _dupDebounce = Timer(kDuplicateCheckDebounce, () async {
+      final exists = await _db.getWordExists(trimmed);
+      if (!mounted) return;
+      _isDuplicate.value = exists;
+    });
+  }
+
   Future<void> _onEnhance() async {
+    if (!await _confirmProceedIfDuplicate()) return;
+    if (!mounted) return;
     // Read the current app locale at the moment the sheet opens. The
     // enhancer bakes this into the LLM prompt's output-language directive,
     // so the meaning / note come back in the same language the user is
@@ -103,8 +139,31 @@ class _AddWordPageState extends State<AddWordPage> {
     if (result.note != null) _noteCtrl.text = result.note!;
   }
 
+  /// Click-time duplicate check. Re-queries the DB (independent of the
+  /// debounced [_isDuplicate] snapshot) so concurrent edits — e.g. deleting
+  /// the duplicate from LibraryPage in another tab — are reflected. Returns
+  /// `true` to proceed, `false` to abort.
+  Future<bool> _confirmProceedIfDuplicate() async {
+    final wordText = _wordCtrl.text.trim();
+    if (wordText.isEmpty) return true;
+    final exists = await _db.getWordExists(wordText);
+    if (!exists) return true;
+    if (!mounted) return false;
+    final result = await showOkCancelAlertDialog(
+      context: context,
+      title: context.l10n.addWordDuplicateDialogTitle,
+      message: context.l10n.addWordDuplicateDialogMessage(wordText),
+      okLabel: context.l10n.addWordDuplicateDialogOk,
+      cancelLabel: context.l10n.addWordDuplicateDialogCancel,
+      barrierDismissible: false,
+    );
+    return result == OkCancelResult.ok;
+  }
+
   Future<void> _onConfirm() async {
-    final dbService = context.read<AppDatabase>();
+    if (!await _confirmProceedIfDuplicate()) return;
+    if (!mounted) return;
+    final dbService = _db;
     final result = await showOkCancelAlertDialog(
       context: context,
       title: context.l10n.addWordSaveDialogTitle,
@@ -146,14 +205,24 @@ class _AddWordPageState extends State<AddWordPage> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 96, 16, 16),
         children: [
-          TextField(
-            controller: _wordCtrl,
-            focusNode: _wordFocus,
-            autofocus: true,
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              labelText: context.l10n.addWordFieldWord,
-              border: const OutlineInputBorder(),
+          ValueListenableBuilder<bool>(
+            valueListenable: _isDuplicate,
+            builder: (_, isDup, _) => TextField(
+              controller: _wordCtrl,
+              focusNode: _wordFocus,
+              autofocus: true,
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                labelText: context.l10n.addWordFieldWord,
+                border: const OutlineInputBorder(),
+                helperText: isDup ? context.l10n.addWordDuplicateWarning : null,
+                helperStyle: isDup
+                    ? TextStyle(color: Colors.amber.shade700)
+                    : null,
+                suffixIcon: isDup
+                    ? const Icon(Icons.warning_amber_rounded, color: Colors.amber)
+                    : null,
+              ),
             ),
           ),
           const SizedBox(height: 12),

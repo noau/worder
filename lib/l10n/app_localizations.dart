@@ -347,6 +347,36 @@ abstract class AppLocalizations {
   /// **'Failed to save the word'**
   String get addWordToastSaveError;
 
+  /// Helper text shown under the Word TextField on the Add Word page when the typed word already exists in the database. Soft warning only — duplicates are allowed (per CLAUDE.md identifier strategy: same word can appear multiple times with different notes/contexts).
+  ///
+  /// In en, this message translates to:
+  /// **'This word is already in your library'**
+  String get addWordDuplicateWarning;
+
+  /// Title of the dialog shown when the user clicks AI Enhance or Confirm on the Add Word page with a word that already exists in the database. Soft warning; the user can proceed by tapping Add anyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate Word'**
+  String get addWordDuplicateDialogTitle;
+
+  /// Body of the duplicate-word dialog on the Add Word page. Includes the offending word in double quotes so the user can verify they typed it correctly. Falls back to English in non-en locales until translated.
+  ///
+  /// In en, this message translates to:
+  /// **'The word \"{word}\" is already in your library. Do you want to add it again?'**
+  String addWordDuplicateDialogMessage(String word);
+
+  /// OK button label of the duplicate-word dialog on the Add Word page. Proceeds with the existing flow (AI Enhance sheet open or save confirmation dialog).
+  ///
+  /// In en, this message translates to:
+  /// **'Add anyway'**
+  String get addWordDuplicateDialogOk;
+
+  /// Cancel button label of the duplicate-word dialog on the Add Word page. Aborts the action.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get addWordDuplicateDialogCancel;
+
   /// Loading text shown inside the AI Enhance sheet while waiting for the LLM to return pinyin/meaning/notes.
   ///
   /// In en, this message translates to:
