@@ -1,4 +1,4 @@
-name: Build and Package Flutter App
+name: Build and Release (APK + Windows)
 
 on:
   workflow_dispatch:
@@ -13,35 +13,39 @@ on:
 
 jobs:
   build:
-    name: Build on Windows
+    name: Build on Windows (for both Android & Windows)
     runs-on: windows-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v1
+      # ---------- 设置 Java 22.x ----------
+      - name: Set up Java 22
+        uses: actions/setup-java@v4
         with:
-          java-version: "22.x"
+          distribution: "temurin"
+          java-version: "22"
 
+      # ---------- 设置 Flutter 3.44.2 ----------
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.44.2"
+          flutter-version: "3.44.2" # 按你实际版本调整，如找不到可改为 'stable'
 
-      - name: Build Flutter app (APK + EXE)
-        uses: antinna/fa@main
-        id: build
-        with:
-          release: true
-          apk_generation: true
-          exe_generation: true
-          # 如需签名，取消注释并配置 Secrets
-          # keystore: ${{ secrets.KEYSTORE_BASE64 }}
-          # keystore-pwd: ${{ secrets.KEYSTORE_PASSWORD }}
-          # key-pwd: ${{ secrets.KEY_PASSWORD }}
+      # ---------- 获取项目依赖 ----------
+      - name: Flutter pub get
+        run: flutter pub get
 
+      # ---------- 构建 Android APK (split per ABI) ----------
+      - name: Build Android APKs (release, split-per-abi)
+        run: flutter build apk --release --split-per-abi
+
+      # ---------- 构建 Windows EXE ----------
+      - name: Build Windows executable
+        run: flutter build windows --release
+
+      # ---------- 获取版本号 ----------
       - name: Get version
         id: version
         shell: bash
@@ -58,6 +62,7 @@ jobs:
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
+      # ---------- 生成时间戳 ----------
       - name: Get timestamp
         id: timestamp
         shell: bash
@@ -65,37 +70,42 @@ jobs:
           TS=$(date +"%Y%m%d-%H%M")
           echo "timestamp=$TS" >> $GITHUB_OUTPUT
 
-      # ---------- 重命名 APK ----------
-      - name: Rename APK
+      # ---------- 重命名 APK 文件（每个 ABI 一个） ----------
+      - name: Rename APKs
         shell: bash
         run: |
-          APK_ORIG="${{ steps.build.outputs.apk-path }}"
-          if [ -f "$APK_ORIG" ]; then
-            VERSION="${{ steps.version.outputs.version }}"
-            TS="${{ steps.timestamp.outputs.timestamp }}"
-            NEW_NAME="Worder-v${VERSION}-${TS}-Android.apk"
-            cp "$APK_ORIG" "$NEW_NAME"
-            echo "apk_renamed=$NEW_NAME" >> $GITHUB_ENV
-          else
-            echo "APK file not found"
-          fi
+          VERSION="${{ steps.version.outputs.version }}"
+          TS="${{ steps.timestamp.outputs.timestamp }}"
+          # 进入 Flutter 生成的 APK 目录
+          cd build/app/outputs/flutter-apk/
+          for apk in app-*.apk; do
+            # 提取架构名: app-armeabi-v7a-release.apk -> armeabi-v7a
+            arch=$(echo "$apk" | sed -E 's/app-(.+)-release\.apk/\1/')
+            new_name="Worder-v${VERSION}-${TS}-Android-${arch}.apk"
+            cp "$apk" "$new_name"
+            echo "Renamed $apk to $new_name"
+          done
+          # 将重命名后的文件移到工作区根目录以便上传
+          cp Worder-*.apk "$GITHUB_WORKSPACE/"
 
-      # ---------- 打包 Windows 为 ZIP ----------
+      # ---------- 打包 Windows 发布文件夹为 ZIP ----------
       - name: Package Windows build
         shell: bash
         run: |
-          WIN_DIR="${{ steps.build.outputs.exe-path }}"
+          WIN_DIR="build/windows/runner/Release"
           if [ -d "$WIN_DIR" ]; then
             VERSION="${{ steps.version.outputs.version }}"
             TS="${{ steps.timestamp.outputs.timestamp }}"
             ZIP_NAME="Worder-v${VERSION}-${TS}-Windows-x64.zip"
+            # Windows 自带 PowerShell 压缩
             powershell -Command "Compress-Archive -Path '$WIN_DIR\*' -DestinationPath '$ZIP_NAME' -Force"
             echo "zip_renamed=$ZIP_NAME" >> $GITHUB_ENV
           else
             echo "Windows build folder not found"
+            exit 1
           fi
 
-      # ---------- 上传 Artifact（总是上传） ----------
+      # ---------- 上传 Artifact（所有产物） ----------
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -105,35 +115,29 @@ jobs:
             Worder-v*.zip
           if-no-files-found: error
 
-      # ========== 新增加的步骤：准备 Release Body ==========
+      # ---------- 准备 Release Body（Changelog + 固定提示） ----------
       - name: Prepare release body
         id: release_body
         shell: bash
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           CHANGELOG_FILE="docs/CHANGELOG_v${VERSION}.md"
-
-          # 读取 Changelog 文件（如果存在）
           if [ -f "$CHANGELOG_FILE" ]; then
             BODY=$(cat "$CHANGELOG_FILE")
           else
             BODY="No changelog provided for this release."
           fi
-
-          # 追加固定提示信息（与你的要求一致）
           BODY="${BODY}\n\n> 预发布版本使用调试密钥库签名；正式签名待 1.0.0 版本进行。\n> Pre-release signed with debug keystore; production signing pending 1.0.0."
-
-          # 将组装好的 body 设置为输出
           echo "body=$BODY" >> $GITHUB_OUTPUT
 
-      # ---------- 创建 GitHub Release（仅在标签推送时） ----------
+      # ---------- 创建 GitHub Release（仅在标签触发时） ----------
       - name: Create Release and upload assets
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          body: ${{ steps.release_body.outputs.body }} # 使用组装好的 body
+          body: ${{ steps.release_body.outputs.body }}
           prerelease: true # 标记为预发布
           draft: false
           files: |
