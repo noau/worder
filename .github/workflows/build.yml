@@ -4,12 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "手动指定版本号（例如 1.0.0，留空则自动从标签获取）"
+        description: '版本号（必填，例如 1.0.0）'
+        required: true
+        default: ''
+      release:
+        description: '是否创建 GitHub Release（预发布）'
         required: false
-        default: ""
+        default: false
+        type: boolean
   push:
     tags:
-      - "v*"
+      - 'v*'
 
 jobs:
   build:
@@ -57,7 +62,8 @@ jobs:
             if [[ "$REF" == refs/tags/v* ]]; then
               VERSION="${REF#refs/tags/v}"
             else
-              VERSION="0.0.0-$(git rev-parse --short HEAD)"
+              echo "Error: version not provided and not a tag push."
+              exit 1
             fi
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -131,18 +137,27 @@ jobs:
           else
             BODY="No changelog provided for this release."
           fi
-          BODY="${BODY}\n\n> 预发布版本使用调试密钥库签名；正式签名待 1.0.0 版本进行。\n> Pre-release signed with debug keystore; production signing pending 1.0.0."
-          echo "body=$BODY" >> $GITHUB_OUTPUT
+          # 追加固定提示，使用 $'\n' 插入换行
+          BODY="${BODY}"$'\n\n'"> 预发布版本使用调试密钥库签名；正式签名待 1.0.0 版本进行。\n> Pre-release signed with debug keystore; production signing pending 1.0.0."
+
+          # 使用 heredoc 安全写入多行内容
+          {
+            echo 'body<<GH_OUTPUT_EOF'
+            echo "$BODY"
+            echo 'GH_OUTPUT_EOF'
+          } >> "$GITHUB_OUTPUT"
 
       # ---------- 创建 GitHub Release（仅在标签触发时） ----------
       - name: Create Release and upload assets
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: |
+          (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.release)
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
+          tag_name: ${{ github.event_name == 'push' && github.ref_name || format('v{0}', github.event.inputs.version) }}
+          name: Release ${{ github.event_name == 'push' && github.ref_name || format('v{0}', github.event.inputs.version) }}
           body: ${{ steps.release_body.outputs.body }}
-          prerelease: true # 标记为预发布
+          prerelease: true
           draft: false
           files: |
             Worder-v*.apk
