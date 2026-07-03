@@ -16,6 +16,11 @@ const Duration kLLMRequestTimeout = Duration(minutes: 10);
 /// debounced SharedPreferences write.
 const Duration kSettingsSaveDebounce = Duration(milliseconds: 300);
 
+/// Delay between the last keystroke on the Add Word field and the database
+/// existence check that drives the duplicate-warning decoration. Short
+/// enough to feel reactive, long enough to coalesce fast typing.
+const Duration kDuplicateCheckDebounce = Duration(milliseconds: 200);
+
 // Database Debugs
 const bool debugDatabaseLogs = false;
 const bool debugDeleteAllDatabaseTables = false;

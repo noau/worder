@@ -202,6 +202,26 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 
+  /// One-shot count query: returns true iff any row in `wordRows` has
+  /// `word == [word]` (exact, case-sensitive match). Empty input short-circuits
+  /// to false so callers don't fire a useless `word = ''` query.
+  ///
+  /// Used by the Add Word page to surface a soft duplicate warning (decoration
+  /// + click-time confirmation dialog). Duplicates are allowed by the schema
+  /// (per CLAUDE.md identifier strategy), so this is advisory only.
+  ///
+  /// Schema note: `WordRows.word` has no index. The table is small enough
+  /// that a full scan is faster than an index lookup for COUNT. Defer
+  /// indexing until measured.
+  Future<bool> getWordExists(String word) async {
+    if (word.isEmpty) return false;
+    final query = selectOnly(wordRows)
+      ..addColumns([wordRows.id.count()])
+      ..where(wordRows.word.equals(word));
+    final row = await query.getSingle();
+    return (row.read(wordRows.id.count()) ?? 0) > 0;
+  }
+
   Stream<List<WordModel>> watchReviewedToday() {
     final start = startOfLocalDay();
     final end = startOfNextLocalDay();

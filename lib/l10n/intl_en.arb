@@ -168,6 +168,32 @@
   "@addWordToastSaveError": {
     "description": "Toast message shown when persisting a new word fails. The form is left intact for retry."
   },
+  "addWordDuplicateWarning": "This word is already in your library",
+  "@addWordDuplicateWarning": {
+    "description": "Helper text shown under the Word TextField on the Add Word page when the typed word already exists in the database. Soft warning only — duplicates are allowed (per CLAUDE.md identifier strategy: same word can appear multiple times with different notes/contexts)."
+  },
+  "addWordDuplicateDialogTitle": "Duplicate Word",
+  "@addWordDuplicateDialogTitle": {
+    "description": "Title of the dialog shown when the user clicks AI Enhance or Confirm on the Add Word page with a word that already exists in the database. Soft warning; the user can proceed by tapping Add anyway."
+  },
+  "addWordDuplicateDialogMessage": "The word \"{word}\" is already in your library. Do you want to add it again?",
+  "@addWordDuplicateDialogMessage": {
+    "description": "Body of the duplicate-word dialog on the Add Word page. Includes the offending word in double quotes so the user can verify they typed it correctly. Falls back to English in non-en locales until translated.",
+    "placeholders": {
+      "word": {
+        "type": "String",
+        "example": "serendipity"
+      }
+    }
+  },
+  "addWordDuplicateDialogOk": "Add anyway",
+  "@addWordDuplicateDialogOk": {
+    "description": "OK button label of the duplicate-word dialog on the Add Word page. Proceeds with the existing flow (AI Enhance sheet open or save confirmation dialog)."
+  },
+  "addWordDuplicateDialogCancel": "Cancel",
+  "@addWordDuplicateDialogCancel": {
+    "description": "Cancel button label of the duplicate-word dialog on the Add Word page. Aborts the action."
+  },
   "addWordEnhanceLoading": "Asking the AI to enhance your word…",
   "@addWordEnhanceLoading": {
     "description": "Loading text shown inside the AI Enhance sheet while waiting for the LLM to return pinyin/meaning/notes."

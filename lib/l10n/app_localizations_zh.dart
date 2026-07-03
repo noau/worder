@@ -143,6 +143,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get addWordToastSaveError => '保存失败';
 
   @override
+  String get addWordDuplicateWarning => 'This word is already in your library';
+
+  @override
+  String get addWordDuplicateDialogTitle => 'Duplicate Word';
+
+  @override
+  String addWordDuplicateDialogMessage(String word) {
+    return 'The word \"$word\" is already in your library. Do you want to add it again?';
+  }
+
+  @override
+  String get addWordDuplicateDialogOk => 'Add anyway';
+
+  @override
+  String get addWordDuplicateDialogCancel => 'Cancel';
+
+  @override
   String get addWordEnhanceLoading => 'AI 正在增强单词信息…';
 
   @override
