@@ -16,6 +16,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build on Windows (for both Android & Windows)
