@@ -31,7 +31,7 @@ jobs:
           flutter-version: "3.44.2"
 
       - name: Build Flutter app (APK + EXE)
-        uses: antinna/fa@v1
+        uses: antinna/fa@main
         id: build
         with:
           release: true
