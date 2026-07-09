@@ -248,9 +248,11 @@ class _WordInfoArea extends StatelessWidget {
 ///
 /// 默认情况下保持与原本 `Row(... baseline, ideographic)` 一致的视觉
 /// (单词 + 拼音同行,baseline 对齐)。当 word + pinyin 在当前 display 尺寸下
-/// 的自然总宽超过父容器可用宽度时,降级为纵向 Column(word 在上,pinyin 在下):
-/// 这样能保留 word 的"主标题"视觉层级,同时把拼音放到次级位置,避免溢出。
-/// pinyin 单条仍超出可用宽度时再用 `FittedBox.scaleDown` 兜底。
+/// 的自然总宽超过父容器可用宽度时,降级为纵向 Column(pinyin 在上,word 在下):
+/// 这样能保留 word 的"主标题"视觉层级,同时把拼音作为小一号注释放上方,
+/// 避免溢出。word 或 pinyin 任一单条仍超出可用宽度时,各自用 `FittedBox.scaleDown`
+/// 兜底,强制单行(过宽则缩小字号),避免 word 被字符级换行砍半或 pinyin 失去
+/// 一行注音的读感。
 class _WordHeadline extends StatelessWidget {
   const _WordHeadline({
     required this.word,
@@ -291,13 +293,13 @@ class _WordHeadline extends StatelessWidget {
             ],
           );
         }
-        // 溢出 case:纵向堆叠。word 走 Text 默认 softWrap(超长 word 自然
-        // 换行),pinyin 单独超宽时再用 FittedBox.scaleDown 兜底,保证不出格。
+        // 溢出 case:纵向堆叠,word 与 pinyin 任一超宽都用 FittedBox.scaleDown
+        // 缩小到单行,而不是依赖字符级 softWrap——避免 word 被砍半或 pinyin
+        // 失去一行注音的读感。
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: _vGap,
           children: [
-            Text(word, style: wordStyle),
             if (pinyinWidth <= maxWidth)
               Text(pinyin, style: pinyinStyle)
             else
@@ -305,6 +307,14 @@ class _WordHeadline extends StatelessWidget {
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
                 child: Text(pinyin, style: pinyinStyle),
+              ),
+            if (wordWidth <= maxWidth)
+              Text(word, style: wordStyle)
+            else
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(word, style: wordStyle),
               ),
           ],
         );
