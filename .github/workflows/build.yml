@@ -141,7 +141,7 @@ jobs:
             BODY="No changelog provided for this release."
           fi
           # 追加固定提示，使用 $'\n' 插入换行
-          BODY="${BODY}"$'\n\n'"> 预发布版本使用调试密钥库签名；正式签名待 1.0.0 版本进行。\n> Pre-release signed with debug keystore; production signing pending 1.0.0."
+          BODY="${BODY}"$'\n\n'"> 预发布版本使用调试密钥库签名；正式签名待 1.0.0 版本进行。Pre-release signed with debug keystore; production signing pending 1.0.0."
 
           # 使用 heredoc 安全写入多行内容
           {
