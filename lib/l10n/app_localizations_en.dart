@@ -270,6 +270,90 @@ class AppLocalizationsEn extends AppLocalizations {
       'Test failed: unexpected error';
 
   @override
+  String get settingsSectionBackup => 'Backup & Restore';
+
+  @override
+  String get settingsBackupDescription =>
+      'Save a complete copy of your library and settings, or restore from one.';
+
+  @override
+  String get settingsBackupExportButton => 'Export backup';
+
+  @override
+  String get settingsBackupImportButton => 'Import backup';
+
+  @override
+  String get settingsBackupExportDialogTitle => 'Save backup as…';
+
+  @override
+  String get settingsBackupExportSuccess => 'Backup saved';
+
+  @override
+  String get settingsBackupImportSuccess =>
+      'Restore complete. Restart to see changes.';
+
+  @override
+  String settingsBackupErrorGeneric(String message) {
+    return 'Backup failed: $message';
+  }
+
+  @override
+  String get settingsBackupImportConfirmTitle => 'Replace all data?';
+
+  @override
+  String get settingsBackupImportConfirmMessage =>
+      'Your current library and settings will be replaced with the contents of the backup. A safety backup of the current state will be saved automatically. This cannot be undone after restart.';
+
+  @override
+  String get settingsBackupImportConfirmOk => 'Restore';
+
+  @override
+  String get settingsBackupImportConfirmCancel => 'Cancel';
+
+  @override
+  String get settingsBackupRestartTitle => 'Restart recommended';
+
+  @override
+  String settingsBackupRestartMessage(String path) {
+    return 'The restore wrote to disk, but visible lists may be stale until restart. A safety backup of the previous state was saved as $path.';
+  }
+
+  @override
+  String get settingsBackupRestartOk => 'Restart now';
+
+  @override
+  String get settingsBackupRestartCancel => 'Later';
+
+  @override
+  String get settingsBackupErrorIo =>
+      'Could not read or write the backup file.';
+
+  @override
+  String get settingsBackupErrorZipCorrupted =>
+      'The backup file is corrupted or not a valid zip.';
+
+  @override
+  String get settingsBackupErrorManifestMissing =>
+      'The backup is missing its manifest.json.';
+
+  @override
+  String settingsBackupErrorUnsupportedVersion(int version) {
+    return 'Backup schema version $version is not supported by this app.';
+  }
+
+  @override
+  String get settingsBackupErrorDatabaseCorrupted =>
+      'The database file inside the backup is corrupted.';
+
+  @override
+  String get settingsBackupErrorPreRestoreFailed =>
+      'Safety backup failed; restore aborted to protect your data.';
+
+  @override
+  String get settingsBackupErrorRestoreFailed =>
+      'Restore failed partway. The previous data is in the safety backup.';
+
+  @override
   String learnHeaderProgressCounter(int reviewed, int total) {
     return '$reviewed / $total';
   }

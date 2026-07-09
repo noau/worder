@@ -575,6 +575,144 @@ abstract class AppLocalizations {
   /// **'Test failed: unexpected error'**
   String get settingsToastTestUnexpectedError;
 
+  /// Section heading on the settings page that groups the export and import buttons.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup & Restore'**
+  String get settingsSectionBackup;
+
+  /// Subtitle below the Backup & Restore section heading, summarising what the buttons do.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a complete copy of your library and settings, or restore from one.'**
+  String get settingsBackupDescription;
+
+  /// Tonal button label that opens a system save dialog and writes a .zip of the current state.
+  ///
+  /// In en, this message translates to:
+  /// **'Export backup'**
+  String get settingsBackupExportButton;
+
+  /// Tonal button label that opens a file picker for a .zip and overwrites the current state after confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Import backup'**
+  String get settingsBackupImportButton;
+
+  /// Title of the system save dialog opened by the Export button (file_picker.saveFile dialogTitle).
+  ///
+  /// In en, this message translates to:
+  /// **'Save backup as…'**
+  String get settingsBackupExportDialogTitle;
+
+  /// Toast shown after a successful export.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup saved'**
+  String get settingsBackupExportSuccess;
+
+  /// Toast shown after a successful restore. Warns the user that streams may be stale until restart.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore complete. Restart to see changes.'**
+  String get settingsBackupImportSuccess;
+
+  /// Catch-all toast for any BackupException not covered by a specific key. Carries the raw message so the user has something to report.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup failed: {message}'**
+  String settingsBackupErrorGeneric(String message);
+
+  /// Title of the destructive confirmation dialog before a restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace all data?'**
+  String get settingsBackupImportConfirmTitle;
+
+  /// Body of the restore confirmation dialog. Explains that the action is destructive AND that a safety backup is created first.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current library and settings will be replaced with the contents of the backup. A safety backup of the current state will be saved automatically. This cannot be undone after restart.'**
+  String get settingsBackupImportConfirmMessage;
+
+  /// OK button label of the restore confirmation dialog. Destructive action.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get settingsBackupImportConfirmOk;
+
+  /// Cancel button label of the restore confirmation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get settingsBackupImportConfirmCancel;
+
+  /// Title of the post-restore dialog asking the user to restart the app so the restored data is fully reflected.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart recommended'**
+  String get settingsBackupRestartTitle;
+
+  /// Body of the post-restore dialog. Includes the path of the pre-restore safety backup so the user can find it if needed.
+  ///
+  /// In en, this message translates to:
+  /// **'The restore wrote to disk, but visible lists may be stale until restart. A safety backup of the previous state was saved as {path}.'**
+  String settingsBackupRestartMessage(String path);
+
+  /// OK button label of the post-restore dialog. Closes the app on Android via SystemNavigator.pop().
+  ///
+  /// In en, this message translates to:
+  /// **'Restart now'**
+  String get settingsBackupRestartOk;
+
+  /// Cancel button label of the post-restore dialog. User keeps using the app with potentially stale views.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get settingsBackupRestartCancel;
+
+  /// Toast shown for BackupException.kind.ioError (file read/write failures outside of zip corruption).
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read or write the backup file.'**
+  String get settingsBackupErrorIo;
+
+  /// Toast shown for BackupException.kind.zipCorrupted when ZipDecoder.decodeBytes throws.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup file is corrupted or not a valid zip.'**
+  String get settingsBackupErrorZipCorrupted;
+
+  /// Toast shown for BackupException.kind.manifestMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup is missing its manifest.json.'**
+  String get settingsBackupErrorManifestMissing;
+
+  /// Toast shown for BackupException.kind.manifestUnsupportedVersion. Includes the version found.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup schema version {version} is not supported by this app.'**
+  String settingsBackupErrorUnsupportedVersion(int version);
+
+  /// Toast shown for BackupException.kind.databaseCorrupted when the SQLite magic header is missing.
+  ///
+  /// In en, this message translates to:
+  /// **'The database file inside the backup is corrupted.'**
+  String get settingsBackupErrorDatabaseCorrupted;
+
+  /// Toast shown for BackupException.kind.preRestoreFailed. Reassures the user the live data was NOT touched.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety backup failed; restore aborted to protect your data.'**
+  String get settingsBackupErrorPreRestoreFailed;
+
+  /// Toast shown for BackupException.kind.restoreFailed after the live DB write succeeded but a follow-up step failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed partway. The previous data is in the safety backup.'**
+  String get settingsBackupErrorRestoreFailed;
+
   /// Small header text on the Learn / Review session page showing how many of the session's words have been rated.
   ///
   /// In en, this message translates to:
