@@ -143,21 +143,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get addWordToastSaveError => '保存失败';
 
   @override
-  String get addWordDuplicateWarning => 'This word is already in your library';
+  String get addWordDuplicateWarning => '该单词已在词库中';
 
   @override
-  String get addWordDuplicateDialogTitle => 'Duplicate Word';
+  String get addWordDuplicateDialogTitle => '重复单词';
 
   @override
   String addWordDuplicateDialogMessage(String word) {
-    return 'The word \"$word\" is already in your library. Do you want to add it again?';
+    return '「$word」已在词库中，是否仍要继续添加？';
   }
 
   @override
-  String get addWordDuplicateDialogOk => 'Add anyway';
+  String get addWordDuplicateDialogOk => '仍然添加';
 
   @override
-  String get addWordDuplicateDialogCancel => 'Cancel';
+  String get addWordDuplicateDialogCancel => '取消';
 
   @override
   String get addWordEnhanceLoading => 'AI 正在增强单词信息…';
@@ -261,88 +261,80 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsToastTestUnexpectedError => '测试失败：发生未知错误';
 
   @override
-  String get settingsSectionBackup => 'Backup & Restore';
+  String get settingsSectionBackup => '备份与恢复';
 
   @override
-  String get settingsBackupDescription =>
-      'Save a complete copy of your library and settings, or restore from one.';
+  String get settingsBackupDescription => '保存词库与设置的完整副本，或从备份中恢复。';
 
   @override
-  String get settingsBackupExportButton => 'Export backup';
+  String get settingsBackupExportButton => '导出备份';
 
   @override
-  String get settingsBackupImportButton => 'Import backup';
+  String get settingsBackupImportButton => '导入备份';
 
   @override
-  String get settingsBackupExportDialogTitle => 'Save backup as…';
+  String get settingsBackupExportDialogTitle => '保存备份为…';
 
   @override
-  String get settingsBackupExportSuccess => 'Backup saved';
+  String get settingsBackupExportSuccess => '备份已保存';
 
   @override
-  String get settingsBackupImportSuccess =>
-      'Restore complete. Restart to see changes.';
+  String get settingsBackupImportSuccess => '恢复完成，请重启应用后查看变化。';
 
   @override
   String settingsBackupErrorGeneric(String message) {
-    return 'Backup failed: $message';
+    return '备份失败：$message';
   }
 
   @override
-  String get settingsBackupImportConfirmTitle => 'Replace all data?';
+  String get settingsBackupImportConfirmTitle => '覆盖全部数据？';
 
   @override
   String get settingsBackupImportConfirmMessage =>
-      'Your current library and settings will be replaced with the contents of the backup. A safety backup of the current state will be saved automatically. This cannot be undone after restart.';
+      '当前的词库与设置将被备份中的内容替换，并会自动保存一份当前数据作为安全备份。重启后将无法撤销。';
 
   @override
-  String get settingsBackupImportConfirmOk => 'Restore';
+  String get settingsBackupImportConfirmOk => '恢复';
 
   @override
-  String get settingsBackupImportConfirmCancel => 'Cancel';
+  String get settingsBackupImportConfirmCancel => '取消';
 
   @override
-  String get settingsBackupRestartTitle => 'Restart recommended';
+  String get settingsBackupRestartTitle => '建议重启';
 
   @override
   String settingsBackupRestartMessage(String path) {
-    return 'The restore wrote to disk, but visible lists may be stale until restart. A safety backup of the previous state was saved as $path.';
+    return '数据已写入磁盘，但界面显示可能需要重启后才更新。恢复前的数据已保存为 $path。';
   }
 
   @override
-  String get settingsBackupRestartOk => 'Restart now';
+  String get settingsBackupRestartOk => '立即重启';
 
   @override
-  String get settingsBackupRestartCancel => 'Later';
+  String get settingsBackupRestartCancel => '稍后';
 
   @override
-  String get settingsBackupErrorIo =>
-      'Could not read or write the backup file.';
+  String get settingsBackupErrorIo => '无法读取或写入备份文件。';
 
   @override
-  String get settingsBackupErrorZipCorrupted =>
-      'The backup file is corrupted or not a valid zip.';
+  String get settingsBackupErrorZipCorrupted => '备份文件已损坏或不是有效的 zip 文件。';
 
   @override
-  String get settingsBackupErrorManifestMissing =>
-      'The backup is missing its manifest.json.';
+  String get settingsBackupErrorManifestMissing => '备份缺少 manifest.json。';
 
   @override
   String settingsBackupErrorUnsupportedVersion(int version) {
-    return 'Backup schema version $version is not supported by this app.';
+    return '备份格式版本 $version 不受本应用支持。';
   }
 
   @override
-  String get settingsBackupErrorDatabaseCorrupted =>
-      'The database file inside the backup is corrupted.';
+  String get settingsBackupErrorDatabaseCorrupted => '备份内的数据库文件已损坏。';
 
   @override
-  String get settingsBackupErrorPreRestoreFailed =>
-      'Safety backup failed; restore aborted to protect your data.';
+  String get settingsBackupErrorPreRestoreFailed => '安全备份失败，已中止恢复以保护你的数据。';
 
   @override
-  String get settingsBackupErrorRestoreFailed =>
-      'Restore failed partway. The previous data is in the safety backup.';
+  String get settingsBackupErrorRestoreFailed => '恢复过程中出错，先前的数据可在安全备份中找到。';
 
   @override
   String learnHeaderProgressCounter(int reviewed, int total) {
@@ -658,6 +650,23 @@ class AppLocalizationsZhHansCn extends AppLocalizationsZh {
   String get addWordToastSaveError => '保存失败';
 
   @override
+  String get addWordDuplicateWarning => '该单词已在词库中';
+
+  @override
+  String get addWordDuplicateDialogTitle => '重复单词';
+
+  @override
+  String addWordDuplicateDialogMessage(String word) {
+    return '「$word」已在词库中，是否仍要继续添加？';
+  }
+
+  @override
+  String get addWordDuplicateDialogOk => '仍然添加';
+
+  @override
+  String get addWordDuplicateDialogCancel => '取消';
+
+  @override
   String get addWordEnhanceLoading => 'AI 正在增强单词信息…';
 
   @override
@@ -759,88 +768,80 @@ class AppLocalizationsZhHansCn extends AppLocalizationsZh {
   String get settingsToastTestUnexpectedError => '测试失败：发生未知错误';
 
   @override
-  String get settingsSectionBackup => 'Backup & Restore';
+  String get settingsSectionBackup => '备份与恢复';
 
   @override
-  String get settingsBackupDescription =>
-      'Save a complete copy of your library and settings, or restore from one.';
+  String get settingsBackupDescription => '保存词库与设置的完整副本，或从备份中恢复。';
 
   @override
-  String get settingsBackupExportButton => 'Export backup';
+  String get settingsBackupExportButton => '导出备份';
 
   @override
-  String get settingsBackupImportButton => 'Import backup';
+  String get settingsBackupImportButton => '导入备份';
 
   @override
-  String get settingsBackupExportDialogTitle => 'Save backup as…';
+  String get settingsBackupExportDialogTitle => '保存备份为…';
 
   @override
-  String get settingsBackupExportSuccess => 'Backup saved';
+  String get settingsBackupExportSuccess => '备份已保存';
 
   @override
-  String get settingsBackupImportSuccess =>
-      'Restore complete. Restart to see changes.';
+  String get settingsBackupImportSuccess => '恢复完成，请重启应用后查看变化。';
 
   @override
   String settingsBackupErrorGeneric(String message) {
-    return 'Backup failed: $message';
+    return '备份失败：$message';
   }
 
   @override
-  String get settingsBackupImportConfirmTitle => 'Replace all data?';
+  String get settingsBackupImportConfirmTitle => '覆盖全部数据？';
 
   @override
   String get settingsBackupImportConfirmMessage =>
-      'Your current library and settings will be replaced with the contents of the backup. A safety backup of the current state will be saved automatically. This cannot be undone after restart.';
+      '当前的词库与设置将被备份中的内容替换，并会自动保存一份当前数据作为安全备份。重启后将无法撤销。';
 
   @override
-  String get settingsBackupImportConfirmOk => 'Restore';
+  String get settingsBackupImportConfirmOk => '恢复';
 
   @override
-  String get settingsBackupImportConfirmCancel => 'Cancel';
+  String get settingsBackupImportConfirmCancel => '取消';
 
   @override
-  String get settingsBackupRestartTitle => 'Restart recommended';
+  String get settingsBackupRestartTitle => '建议重启';
 
   @override
   String settingsBackupRestartMessage(String path) {
-    return 'The restore wrote to disk, but visible lists may be stale until restart. A safety backup of the previous state was saved as $path.';
+    return '数据已写入磁盘，但界面显示可能需要重启后才更新。恢复前的数据已保存为 $path。';
   }
 
   @override
-  String get settingsBackupRestartOk => 'Restart now';
+  String get settingsBackupRestartOk => '立即重启';
 
   @override
-  String get settingsBackupRestartCancel => 'Later';
+  String get settingsBackupRestartCancel => '稍后';
 
   @override
-  String get settingsBackupErrorIo =>
-      'Could not read or write the backup file.';
+  String get settingsBackupErrorIo => '无法读取或写入备份文件。';
 
   @override
-  String get settingsBackupErrorZipCorrupted =>
-      'The backup file is corrupted or not a valid zip.';
+  String get settingsBackupErrorZipCorrupted => '备份文件已损坏或不是有效的 zip 文件。';
 
   @override
-  String get settingsBackupErrorManifestMissing =>
-      'The backup is missing its manifest.json.';
+  String get settingsBackupErrorManifestMissing => '备份缺少 manifest.json。';
 
   @override
   String settingsBackupErrorUnsupportedVersion(int version) {
-    return 'Backup schema version $version is not supported by this app.';
+    return '备份格式版本 $version 不受本应用支持。';
   }
 
   @override
-  String get settingsBackupErrorDatabaseCorrupted =>
-      'The database file inside the backup is corrupted.';
+  String get settingsBackupErrorDatabaseCorrupted => '备份内的数据库文件已损坏。';
 
   @override
-  String get settingsBackupErrorPreRestoreFailed =>
-      'Safety backup failed; restore aborted to protect your data.';
+  String get settingsBackupErrorPreRestoreFailed => '安全备份失败，已中止恢复以保护你的数据。';
 
   @override
-  String get settingsBackupErrorRestoreFailed =>
-      'Restore failed partway. The previous data is in the safety backup.';
+  String get settingsBackupErrorRestoreFailed => '恢复过程中出错，先前的数据可在安全备份中找到。';
 
   @override
   String learnHeaderProgressCounter(int reviewed, int total) {
@@ -1156,6 +1157,23 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get addWordToastSaveError => '儲存失敗';
 
   @override
+  String get addWordDuplicateWarning => '此單詞已存在於詞庫中';
+
+  @override
+  String get addWordDuplicateDialogTitle => '重複單詞';
+
+  @override
+  String addWordDuplicateDialogMessage(String word) {
+    return '「$word」已存在於詞庫中，是否仍要繼續新增？';
+  }
+
+  @override
+  String get addWordDuplicateDialogOk => '仍然新增';
+
+  @override
+  String get addWordDuplicateDialogCancel => '取消';
+
+  @override
   String get addWordEnhanceLoading => 'AI 正在增強單詞資訊…';
 
   @override
@@ -1257,88 +1275,80 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get settingsToastTestUnexpectedError => '測試失敗：發生未知錯誤';
 
   @override
-  String get settingsSectionBackup => 'Backup & Restore';
+  String get settingsSectionBackup => '備份與復原';
 
   @override
-  String get settingsBackupDescription =>
-      'Save a complete copy of your library and settings, or restore from one.';
+  String get settingsBackupDescription => '儲存詞庫與設定的完整副本，或從備份復原。';
 
   @override
-  String get settingsBackupExportButton => 'Export backup';
+  String get settingsBackupExportButton => '匯出備份';
 
   @override
-  String get settingsBackupImportButton => 'Import backup';
+  String get settingsBackupImportButton => '匯入備份';
 
   @override
-  String get settingsBackupExportDialogTitle => 'Save backup as…';
+  String get settingsBackupExportDialogTitle => '儲存備份為…';
 
   @override
-  String get settingsBackupExportSuccess => 'Backup saved';
+  String get settingsBackupExportSuccess => '備份已儲存';
 
   @override
-  String get settingsBackupImportSuccess =>
-      'Restore complete. Restart to see changes.';
+  String get settingsBackupImportSuccess => '復原完成，請重新啟動後再查看變更。';
 
   @override
   String settingsBackupErrorGeneric(String message) {
-    return 'Backup failed: $message';
+    return '備份失敗：$message';
   }
 
   @override
-  String get settingsBackupImportConfirmTitle => 'Replace all data?';
+  String get settingsBackupImportConfirmTitle => '覆蓋全部資料？';
 
   @override
   String get settingsBackupImportConfirmMessage =>
-      'Your current library and settings will be replaced with the contents of the backup. A safety backup of the current state will be saved automatically. This cannot be undone after restart.';
+      '目前的詞庫與設定將被備份中的內容取代，並會自動儲存一份目前資料作為安全備份。重新啟動後將無法復原。';
 
   @override
-  String get settingsBackupImportConfirmOk => 'Restore';
+  String get settingsBackupImportConfirmOk => '復原';
 
   @override
-  String get settingsBackupImportConfirmCancel => 'Cancel';
+  String get settingsBackupImportConfirmCancel => '取消';
 
   @override
-  String get settingsBackupRestartTitle => 'Restart recommended';
+  String get settingsBackupRestartTitle => '建議重新啟動';
 
   @override
   String settingsBackupRestartMessage(String path) {
-    return 'The restore wrote to disk, but visible lists may be stale until restart. A safety backup of the previous state was saved as $path.';
+    return '資料已寫入磁碟，但畫面顯示可能要重新啟動後才會更新。復原前的資料已儲存為 $path。';
   }
 
   @override
-  String get settingsBackupRestartOk => 'Restart now';
+  String get settingsBackupRestartOk => '立即重新啟動';
 
   @override
-  String get settingsBackupRestartCancel => 'Later';
+  String get settingsBackupRestartCancel => '稍後';
 
   @override
-  String get settingsBackupErrorIo =>
-      'Could not read or write the backup file.';
+  String get settingsBackupErrorIo => '無法讀取或寫入備份檔案。';
 
   @override
-  String get settingsBackupErrorZipCorrupted =>
-      'The backup file is corrupted or not a valid zip.';
+  String get settingsBackupErrorZipCorrupted => '備份檔案已損壞或不是有效的 zip 檔案。';
 
   @override
-  String get settingsBackupErrorManifestMissing =>
-      'The backup is missing its manifest.json.';
+  String get settingsBackupErrorManifestMissing => '備份缺少 manifest.json。';
 
   @override
   String settingsBackupErrorUnsupportedVersion(int version) {
-    return 'Backup schema version $version is not supported by this app.';
+    return '備份格式版本 $version 不受本應用程式支援。';
   }
 
   @override
-  String get settingsBackupErrorDatabaseCorrupted =>
-      'The database file inside the backup is corrupted.';
+  String get settingsBackupErrorDatabaseCorrupted => '備份內的資料庫檔案已損壞。';
 
   @override
-  String get settingsBackupErrorPreRestoreFailed =>
-      'Safety backup failed; restore aborted to protect your data.';
+  String get settingsBackupErrorPreRestoreFailed => '安全備份失敗，已中止復原以保護你的資料。';
 
   @override
-  String get settingsBackupErrorRestoreFailed =>
-      'Restore failed partway. The previous data is in the safety backup.';
+  String get settingsBackupErrorRestoreFailed => '復原過程中發生錯誤，先前的資料可在安全備份中找到。';
 
   @override
   String learnHeaderProgressCounter(int reviewed, int total) {
@@ -1654,6 +1664,23 @@ class AppLocalizationsZhHantTw extends AppLocalizationsZh {
   String get addWordToastSaveError => '儲存失敗';
 
   @override
+  String get addWordDuplicateWarning => '此單詞已存在於詞庫中';
+
+  @override
+  String get addWordDuplicateDialogTitle => '重複單詞';
+
+  @override
+  String addWordDuplicateDialogMessage(String word) {
+    return '「$word」已存在於詞庫中，是否仍要繼續新增？';
+  }
+
+  @override
+  String get addWordDuplicateDialogOk => '仍然新增';
+
+  @override
+  String get addWordDuplicateDialogCancel => '取消';
+
+  @override
   String get addWordEnhanceLoading => 'AI 正在增強單詞資訊…';
 
   @override
@@ -1755,88 +1782,80 @@ class AppLocalizationsZhHantTw extends AppLocalizationsZh {
   String get settingsToastTestUnexpectedError => '測試失敗：發生未知錯誤';
 
   @override
-  String get settingsSectionBackup => 'Backup & Restore';
+  String get settingsSectionBackup => '備份與還原';
 
   @override
-  String get settingsBackupDescription =>
-      'Save a complete copy of your library and settings, or restore from one.';
+  String get settingsBackupDescription => '儲存詞庫與設定的完整副本，或從備份還原。';
 
   @override
-  String get settingsBackupExportButton => 'Export backup';
+  String get settingsBackupExportButton => '匯出備份';
 
   @override
-  String get settingsBackupImportButton => 'Import backup';
+  String get settingsBackupImportButton => '匯入備份';
 
   @override
-  String get settingsBackupExportDialogTitle => 'Save backup as…';
+  String get settingsBackupExportDialogTitle => '儲存備份為…';
 
   @override
-  String get settingsBackupExportSuccess => 'Backup saved';
+  String get settingsBackupExportSuccess => '備份已儲存';
 
   @override
-  String get settingsBackupImportSuccess =>
-      'Restore complete. Restart to see changes.';
+  String get settingsBackupImportSuccess => '還原完成，請重新啟動後再查看變更。';
 
   @override
   String settingsBackupErrorGeneric(String message) {
-    return 'Backup failed: $message';
+    return '備份失敗：$message';
   }
 
   @override
-  String get settingsBackupImportConfirmTitle => 'Replace all data?';
+  String get settingsBackupImportConfirmTitle => '覆蓋全部資料？';
 
   @override
   String get settingsBackupImportConfirmMessage =>
-      'Your current library and settings will be replaced with the contents of the backup. A safety backup of the current state will be saved automatically. This cannot be undone after restart.';
+      '目前的詞庫與設定將被備份中的內容取代，並會自動儲存一份目前資料作為安全備份。重新啟動後將無法復原。';
 
   @override
-  String get settingsBackupImportConfirmOk => 'Restore';
+  String get settingsBackupImportConfirmOk => '還原';
 
   @override
-  String get settingsBackupImportConfirmCancel => 'Cancel';
+  String get settingsBackupImportConfirmCancel => '取消';
 
   @override
-  String get settingsBackupRestartTitle => 'Restart recommended';
+  String get settingsBackupRestartTitle => '建議重新啟動';
 
   @override
   String settingsBackupRestartMessage(String path) {
-    return 'The restore wrote to disk, but visible lists may be stale until restart. A safety backup of the previous state was saved as $path.';
+    return '資料已寫入磁碟，但畫面顯示可能要重新啟動後才會更新。還原前的資料已儲存為 $path。';
   }
 
   @override
-  String get settingsBackupRestartOk => 'Restart now';
+  String get settingsBackupRestartOk => '立即重新啟動';
 
   @override
-  String get settingsBackupRestartCancel => 'Later';
+  String get settingsBackupRestartCancel => '稍後';
 
   @override
-  String get settingsBackupErrorIo =>
-      'Could not read or write the backup file.';
+  String get settingsBackupErrorIo => '無法讀取或寫入備份檔案。';
 
   @override
-  String get settingsBackupErrorZipCorrupted =>
-      'The backup file is corrupted or not a valid zip.';
+  String get settingsBackupErrorZipCorrupted => '備份檔案已損壞或不是有效的 zip 檔案。';
 
   @override
-  String get settingsBackupErrorManifestMissing =>
-      'The backup is missing its manifest.json.';
+  String get settingsBackupErrorManifestMissing => '備份缺少 manifest.json。';
 
   @override
   String settingsBackupErrorUnsupportedVersion(int version) {
-    return 'Backup schema version $version is not supported by this app.';
+    return '備份格式版本 $version 不受本應用支援。';
   }
 
   @override
-  String get settingsBackupErrorDatabaseCorrupted =>
-      'The database file inside the backup is corrupted.';
+  String get settingsBackupErrorDatabaseCorrupted => '備份內的資料庫檔案已損壞。';
 
   @override
-  String get settingsBackupErrorPreRestoreFailed =>
-      'Safety backup failed; restore aborted to protect your data.';
+  String get settingsBackupErrorPreRestoreFailed => '安全備份失敗，已中止還原以保護你的資料。';
 
   @override
-  String get settingsBackupErrorRestoreFailed =>
-      'Restore failed partway. The previous data is in the safety backup.';
+  String get settingsBackupErrorRestoreFailed => '還原過程中發生錯誤，先前的資料可在安全備份中找到。';
 
   @override
   String learnHeaderProgressCounter(int reviewed, int total) {
