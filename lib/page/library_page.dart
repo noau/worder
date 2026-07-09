@@ -9,6 +9,7 @@ import 'package:worder/database.dart';
 import 'package:worder/entity/word_model.dart';
 import 'package:worder/routing.dart';
 import 'package:worder/util/context_l10n.dart';
+import 'package:worder/util/word_hero_source.dart';
 import 'package:worder/widget/library_word_card.dart';
 
 @RoutePage()
@@ -111,7 +112,9 @@ class _LibraryPageState extends State<LibraryPage> {
               padding: const EdgeInsets.only(bottom: 12),
               child: LibraryWordCard(
                 word: words[i],
-                onTap: () => context.pushRoute(WordDetailRoute(word: words[i])),
+                onTap: () => context.pushRoute(
+                  WordDetailRoute(word: words[i], source: WordDetailSource.library),
+                ),
                 onLongPress: () => _openActions(context, words[i]),
               ),
             ),

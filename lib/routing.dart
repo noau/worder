@@ -11,6 +11,7 @@ import 'package:worder/page/library_page.dart';
 import 'package:worder/page/settings_page.dart';
 import 'package:worder/page/splash.dart';
 import 'package:worder/page/word_detail_page.dart';
+import 'package:worder/util/word_hero_source.dart';
 
 part 'routing.gr.dart';
 

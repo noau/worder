@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:worder/entity/word_model.dart';
+import 'package:worder/util/word_hero_source.dart';
 
 /// Dashboard 标签页专用卡片。
 ///
 /// 视觉与 [LibraryWordCard] 保持一致(后续可能分化)。
 /// onTap 由 DashboardPage 注入,跳转到 WordDetailPage。
 class DashboardWordCard extends StatelessWidget {
-  // FIXME(review#9): 本 widget 与 LibraryWordCard 除了 onTap 一个参数之外
-  // 完全字节级相同(Card/InkWell/Padding/Column/字号/baseline 一致)。
-  // "后续可能分化" 至今未发生,任何视觉调整必须同步两份。
-  //
-  // 修复方案:合并成一个 WordCard(word, {VoidCallback? onTap, VoidCallback?
-  // onLongPress}) 组件,两个调用方分别只传自己关心的参数,删除本类与
-  // LibraryWordCard 的其中之一。
   const DashboardWordCard({super.key, required this.word, this.onTap});
 
   final WordModel word;
@@ -45,7 +39,10 @@ class DashboardWordCard extends StatelessWidget {
                 textBaseline: TextBaseline.ideographic,
                 spacing: 4,
                 children: [
-                  Text(word.word, style: theme.textTheme.titleLarge),
+                  Hero(
+                    tag: wordHeroTag(WordDetailSource.dashboard, word.id),
+                    child: Text(word.word, style: theme.textTheme.titleLarge),
+                  ),
                   Text(
                     word.pinyin,
                     style: theme.textTheme.titleMedium?.copyWith(

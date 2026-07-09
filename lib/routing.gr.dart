@@ -214,10 +214,11 @@ class WordDetailRoute extends PageRouteInfo<WordDetailRouteArgs> {
   WordDetailRoute({
     Key? key,
     required WordModel word,
+    required WordDetailSource source,
     List<PageRouteInfo>? children,
   }) : super(
          WordDetailRoute.name,
-         args: WordDetailRouteArgs(key: key, word: word),
+         args: WordDetailRouteArgs(key: key, word: word, source: source),
          initialChildren: children,
        );
 
@@ -227,30 +228,40 @@ class WordDetailRoute extends PageRouteInfo<WordDetailRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<WordDetailRouteArgs>();
-      return WordDetailPage(key: args.key, word: args.word);
+      return WordDetailPage(
+        key: args.key,
+        word: args.word,
+        source: args.source,
+      );
     },
   );
 }
 
 class WordDetailRouteArgs {
-  const WordDetailRouteArgs({this.key, required this.word});
+  const WordDetailRouteArgs({
+    this.key,
+    required this.word,
+    required this.source,
+  });
 
   final Key? key;
 
   final WordModel word;
 
+  final WordDetailSource source;
+
   @override
   String toString() {
-    return 'WordDetailRouteArgs{key: $key, word: $word}';
+    return 'WordDetailRouteArgs{key: $key, word: $word, source: $source}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! WordDetailRouteArgs) return false;
-    return key == other.key && word == other.word;
+    return key == other.key && word == other.word && source == other.source;
   }
 
   @override
-  int get hashCode => key.hashCode ^ word.hashCode;
+  int get hashCode => key.hashCode ^ word.hashCode ^ source.hashCode;
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:worder/entity/word_model.dart';
+import 'package:worder/util/word_hero_source.dart';
 
 /// Library 标签页专用卡片。
 ///
@@ -7,12 +8,6 @@ import 'package:worder/entity/word_model.dart';
 /// - onTap:由 LibraryPage 注入,跳转到 WordDetailPage。
 /// - onLongPress:由 LibraryPage 注入,触发底部动作面板。
 class LibraryWordCard extends StatelessWidget {
-  // FIXME(review#9): 本 widget 与 DashboardWordCard 除了 onLongPress 一个
-  // 参数之外完全字节级相同。"后续可能分化" 至今未发生,任何视觉调整必须同步两份。
-  //
-  // 修复方案:合并成一个 WordCard(word, {VoidCallback? onTap, VoidCallback?
-  // onLongPress}) 组件,两个调用方分别只传自己关心的参数,删除本类与
-  // DashboardWordCard 的其中之一。
   const LibraryWordCard({
     super.key,
     required this.word,
@@ -52,7 +47,10 @@ class LibraryWordCard extends StatelessWidget {
                 textBaseline: TextBaseline.ideographic,
                 spacing: 4,
                 children: [
-                  Text(word.word, style: theme.textTheme.titleLarge),
+                  Hero(
+                    tag: wordHeroTag(WordDetailSource.library, word.id),
+                    child: Text(word.word, style: theme.textTheme.titleLarge),
+                  ),
                   Text(
                     word.pinyin,
                     style: theme.textTheme.titleMedium?.copyWith(

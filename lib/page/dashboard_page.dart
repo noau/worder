@@ -13,6 +13,7 @@ import 'package:worder/routing.dart';
 import 'package:worder/util/context_l10n.dart';
 import 'package:worder/util/date_format.dart';
 import 'package:worder/util/day_rollover_stream.dart';
+import 'package:worder/util/word_hero_source.dart';
 import 'package:worder/widget/dashboard_word_card.dart';
 
 @RoutePage()
@@ -433,7 +434,9 @@ class _RecentSection extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 12),
                     child: DashboardWordCard(
                       word: w,
-                      onTap: () => context.pushRoute(WordDetailRoute(word: w)),
+                      onTap: () => context.pushRoute(
+                        WordDetailRoute(word: w, source: WordDetailSource.dashboard),
+                      ),
                     ),
                   ),
               ],

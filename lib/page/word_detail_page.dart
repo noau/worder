@@ -8,6 +8,7 @@ import 'package:worder/entity/word_model.dart';
 import 'package:worder/repository.dart';
 import 'package:worder/util/context_l10n.dart';
 import 'package:worder/util/date_format.dart';
+import 'package:worder/util/word_hero_source.dart';
 
 /// 单个 word 的详情页。
 ///
@@ -16,9 +17,18 @@ import 'package:worder/util/date_format.dart';
 /// 可回忆概率 + 时间线)、note 列表(长按操作:编辑 / 置顶 / 删除)。
 @RoutePage()
 class WordDetailPage extends StatefulWidget {
-  const WordDetailPage({super.key, required this.word});
+  const WordDetailPage({
+    super.key,
+    required this.word,
+    required this.source,
+  });
 
   final WordModel word;
+
+  /// Hero tag 按来源 tab 区分。卡片端的 `LibraryWordCard` /
+  /// `DashboardWordCard` 各自硬编码自己的 `WordDetailSource`,
+  /// 这里也必须传同一个,否则 Hero flight 匹配不上。
+  final WordDetailSource source;
 
   @override
   State<WordDetailPage> createState() => _WordDetailPageState();
@@ -146,7 +156,7 @@ class _WordDetailPageState extends State<WordDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _WordInfoArea(word: word),
+                  _WordInfoArea(word: word, source: widget.source),
                   const SizedBox(height: 16),
                   Text(
                     context.l10n.wordDetailSectionStats,
@@ -212,9 +222,12 @@ class _InlineError extends StatelessWidget {
 // ===========================================================================
 
 class _WordInfoArea extends StatelessWidget {
-  const _WordInfoArea({required this.word});
+  const _WordInfoArea({required this.word, required this.source});
 
   final WordModel word;
+
+  /// Hero 来源 tab,与卡片端硬编码的 `WordDetailSource` 同名才能匹配。
+  final WordDetailSource source;
 
   @override
   Widget build(BuildContext context) {
@@ -227,6 +240,8 @@ class _WordInfoArea extends StatelessWidget {
         _WordHeadline(
           word: word.word,
           pinyin: word.pinyin,
+          wordId: word.id,
+          source: source,
           wordStyle: theme.textTheme.displayLarge,
           pinyinStyle: theme.textTheme.displayMedium?.copyWith(
             color: colors.onSurfaceVariant,
@@ -259,12 +274,25 @@ class _WordHeadline extends StatelessWidget {
     required this.pinyin,
     required this.wordStyle,
     required this.pinyinStyle,
+    this.wordId,
+    this.source,
   });
 
   final String word;
   final String pinyin;
   final TextStyle? wordStyle;
   final TextStyle? pinyinStyle;
+
+  /// Hero tag 中的 wordId。给定时 word 文本会作为 Hero 源/目的端。
+  final String? wordId;
+
+  /// Hero tag 中的来源 tab。Library 与 Dashboard 两个源在 tree 里
+  /// 共存(由 `AutoTabsScaffold` IndexedStack 行为导致),同一 wordId
+  /// 在两个 tab 上同名 Hero 会撞 tag,所以这里把 source 也写进 tag。
+  ///
+  /// `_WordInfoArea` 处两者都给,`Hero(tag: wordHeroTag(source!, wordId!))`;
+  /// `_NoteActionsSheet` / `_NoteEditorSheet` 里都不给,回到纯 Text。
+  final WordDetailSource? source;
 
   /// 横向布局时 word 与 pinyin 之间的间距(对齐原 Row spacing)。
   static const double _hGap = 4;
@@ -288,7 +316,7 @@ class _WordHeadline extends StatelessWidget {
             textBaseline: TextBaseline.ideographic,
             spacing: _hGap,
             children: [
-              Text(word, style: wordStyle),
+              _heroWord(),
               Text(pinyin, style: pinyinStyle),
             ],
           );
@@ -309,17 +337,28 @@ class _WordHeadline extends StatelessWidget {
                 child: Text(pinyin, style: pinyinStyle),
               ),
             if (wordWidth <= maxWidth)
-              Text(word, style: wordStyle)
+              _heroWord()
             else
               FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
-                child: Text(word, style: wordStyle),
+                child: _heroWord(),
               ),
           ],
         );
       },
     );
+  }
+
+  /// word 文本按 [wordId] 是否给定切换 Hero / 纯 Text。
+  ///
+  /// 仅 word 参与 Hero,pinyin 留在原地——pinyin 从 `titleMedium`(card)飞到
+  /// `displayMedium`(detail)尺寸跨度太大,会让飞行看起来"被拉伸",纯
+  /// Text 由 Flutter 在源 / 目的端各画一份反而自然。
+  Widget _heroWord() {
+    final text = Text(word, style: wordStyle);
+    if (wordId == null || source == null) return text;
+    return Hero(tag: wordHeroTag(source!, wordId!), child: text);
   }
 
   /// 量出 text 在给定 style 下的自然单行宽度。
