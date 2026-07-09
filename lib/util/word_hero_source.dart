@@ -10,10 +10,7 @@
 /// 修法:把 Hero tag 按 push 来源的 tab 区分。卡片端硬编码各自的
 /// `[WordDetailSource]`,详情页通过路由参数把同样的 `[WordDetailSource]`
 /// 带到目的端,两端拼出**唯一**的 tag。
-enum WordDetailSource {
-  library,
-  dashboard,
-}
+enum WordDetailSource { library, dashboard }
 
 /// 构造 word 文本 Hero 标签。card 与 `_WordHeadline` 两端必须传
 /// **同样的** `[source]` + `[wordId]`,否则 Hero 匹配不上。

@@ -16,10 +16,7 @@ class LlmErrorLocalizer {
 
   /// Map an [LLMException.kind] + [LLMException.params] to a localized
   /// string via `context.l10n.aiErrorXxx(...)`.
-  static String localizeLLMException(
-    BuildContext context,
-    LLMException e,
-  ) {
+  static String localizeLLMException(BuildContext context, LLMException e) {
     final l10n = context.l10n;
     final p = e.params ?? const <String, Object>{};
     switch (e.kind) {
@@ -46,10 +43,7 @@ class LlmErrorLocalizer {
   /// [localizeLLMException] using the carried [LLMException] from
   /// [EnhanceError.cause]. For [EnhanceErrorKind.unknown], formats the
   /// `cause.toString()` into the generic AI error template.
-  static String localizeEnhanceError(
-    BuildContext context,
-    EnhanceError e,
-  ) {
+  static String localizeEnhanceError(BuildContext context, EnhanceError e) {
     final l10n = context.l10n;
     switch (e.kind) {
       case EnhanceErrorKind.unexpectedFormat:

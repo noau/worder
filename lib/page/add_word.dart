@@ -220,7 +220,10 @@ class _AddWordPageState extends State<AddWordPage> {
                     ? TextStyle(color: Colors.amber.shade700)
                     : null,
                 suffixIcon: isDup
-                    ? const Icon(Icons.warning_amber_rounded, color: Colors.amber)
+                    ? const Icon(
+                        Icons.warning_amber_rounded,
+                        color: Colors.amber,
+                      )
                     : null,
               ),
             ),

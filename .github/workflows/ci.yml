@@ -1,0 +1,128 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-checks:
+    name: Static checks (analyze + format)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '22'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.2'
+          channel: stable
+          cache: true
+
+      - name: Show tool versions
+        run: |
+          flutter --version
+          dart --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run code generation (build_runner)
+        run: dart run build_runner build
+
+      - name: Run flutter analyze
+        run: flutter analyze --fatal-infos
+
+      - name: Check formatting
+        run: dart format --set-exit-if-changed lib/
+
+  android-build:
+    name: Android debug APK build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '22'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.2'
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run code generation (build_runner)
+        run: dart run build_runner build
+
+      - name: Build debug APK
+        run: flutter build apk --debug
+
+      - name: Upload debug APK on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-build-failed
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: ignore
+          retention-days: 7
+
+  windows-build:
+    name: Windows debug EXE build
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '22'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.2'
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run code generation (build_runner)
+        run: dart run build_runner build
+
+      - name: Build Windows debug executable
+        run: flutter build windows --debug
+
+      - name: Upload Windows debug build on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-debug-build-failed
+          path: build/windows/x64/runner/Debug/*.exe
+          if-no-files-found: ignore
+          retention-days: 7

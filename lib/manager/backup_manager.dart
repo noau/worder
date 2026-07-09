@@ -560,10 +560,7 @@ class BackupManager {
   }) async {
     if (!present) return;
     if (bytes == null) {
-      throw BackupException(
-        BackupErrorKind.ioError,
-        message: missingMessage,
-      );
+      throw BackupException(BackupErrorKind.ioError, message: missingMessage);
     }
     try {
       await apply(bytes);

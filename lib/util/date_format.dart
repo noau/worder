@@ -67,11 +67,7 @@ DateTime startOfNextLocalDay([DateTime? source]) {
 /// - 过去 → `relativeOverdueDays`
 ///
 /// [now] 参数仅用于测试入口;生产代码不传,默认取 `DateTime.now()`。
-String formatRelative(
-  BuildContext context,
-  DateTime utc, {
-  DateTime? now,
-}) {
+String formatRelative(BuildContext context, DateTime utc, {DateTime? now}) {
   final n = (now ?? DateTime.now()).toUtc();
   final diff = utc.difference(n);
   if (diff.inSeconds.abs() < 60) return context.l10n.relativeNow;

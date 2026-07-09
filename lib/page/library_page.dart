@@ -77,11 +77,11 @@ class _LibraryPageState extends State<LibraryPage> {
     try {
       await db.deleteWord(word);
     } catch (_) {
-      if (!mounted) return;
+      if (!context.mounted) return;
       BotToast.showText(text: context.l10n.libraryToastDeleteError);
       return;
     }
-    if (!mounted) return;
+    if (!context.mounted) return;
     BotToast.showText(text: context.l10n.libraryToastDeleteSuccess);
   }
 
@@ -113,7 +113,10 @@ class _LibraryPageState extends State<LibraryPage> {
               child: LibraryWordCard(
                 word: words[i],
                 onTap: () => context.pushRoute(
-                  WordDetailRoute(word: words[i], source: WordDetailSource.library),
+                  WordDetailRoute(
+                    word: words[i],
+                    source: WordDetailSource.library,
+                  ),
                 ),
                 onLongPress: () => _openActions(context, words[i]),
               ),

@@ -15,11 +15,7 @@ import 'enhance_field.dart';
 /// notifications (re-emitting the same result does not trigger a rebuild).
 @immutable
 class EnhanceResult {
-  const EnhanceResult({
-    required this.pinyin,
-    required this.meaning,
-    this.note,
-  });
+  const EnhanceResult({required this.pinyin, required this.meaning, this.note});
 
   final String pinyin;
   final String meaning;
@@ -111,11 +107,9 @@ class EnhanceError extends EnhanceState {
 /// [regenerate] / [start] call while one is running first aborts the
 /// in-flight call and waits for its future to settle before proceeding.
 class AIEnhancer {
-  AIEnhancer({
-    required AIService aiService,
-    required Locale outputLocale,
-  })  : _aiService = aiService,
-       _outputLocale = outputLocale;
+  AIEnhancer({required AIService aiService, required Locale outputLocale})
+    : _aiService = aiService,
+      _outputLocale = outputLocale;
 
   final AIService _aiService;
 
@@ -125,8 +119,9 @@ class AIEnhancer {
   /// [start] call so a locale change is picked up on the next session.
   final Locale _outputLocale;
 
-  final ValueNotifier<EnhanceState> _state =
-      ValueNotifier<EnhanceState>(const EnhanceInitial());
+  final ValueNotifier<EnhanceState> _state = ValueNotifier<EnhanceState>(
+    const EnhanceInitial(),
+  );
 
   /// Read-only state stream. The sheet subscribes via
   /// [ValueListenableBuilder].

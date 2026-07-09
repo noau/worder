@@ -103,10 +103,7 @@ class AIService {
         'AIService.$methodName: ${e.runtimeType} ${e.message}',
         name: 'AIService',
       );
-      throw LLMException(
-        LLMErrorKind.generic,
-        params: {'message': e.message},
-      );
+      throw LLMException(LLMErrorKind.generic, params: {'message': e.message});
     } finally {
       client.close();
     }

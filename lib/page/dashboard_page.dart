@@ -125,7 +125,9 @@ class _DashboardPageState extends State<DashboardPage> {
       dueCount = await svc.getExpiredWordsCount();
     } catch (_) {
       if (!mounted) return;
-      BotToast.showText(text: context.l10n.dashboardErrorCouldNotLoadReviewStatus);
+      BotToast.showText(
+        text: context.l10n.dashboardErrorCouldNotLoadReviewStatus,
+      );
       return;
     }
     if (!mounted) return;
@@ -147,7 +149,9 @@ class _DashboardPageState extends State<DashboardPage> {
       words = await svc.getLearningWords(limit: prefs.learnBatchSize);
     } catch (_) {
       if (!mounted) return;
-      BotToast.showText(text: context.l10n.dashboardErrorCouldNotLoadLearningWords);
+      BotToast.showText(
+        text: context.l10n.dashboardErrorCouldNotLoadLearningWords,
+      );
       return;
     }
     if (!mounted) return;
@@ -174,7 +178,9 @@ class _DashboardPageState extends State<DashboardPage> {
       words = await svc.getExpiredWords(limit: prefs.reviewBatchSize);
     } catch (_) {
       if (!mounted) return;
-      BotToast.showText(text: context.l10n.dashboardErrorCouldNotLoadReviewWords);
+      BotToast.showText(
+        text: context.l10n.dashboardErrorCouldNotLoadReviewWords,
+      );
       return;
     }
     if (!mounted) return;
@@ -435,7 +441,10 @@ class _RecentSection extends StatelessWidget {
                     child: DashboardWordCard(
                       word: w,
                       onTap: () => context.pushRoute(
-                        WordDetailRoute(word: w, source: WordDetailSource.dashboard),
+                        WordDetailRoute(
+                          word: w,
+                          source: WordDetailSource.dashboard,
+                        ),
                       ),
                     ),
                   ),

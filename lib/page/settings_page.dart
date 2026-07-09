@@ -107,6 +107,7 @@ class _SettingsPageState extends State<SettingsPage> {
     try {
       await _repository.setLLMConfig(config: next);
     } catch (_) {
+      if (!mounted) return;
       _safeToast(context.l10n.settingsToastSaveError);
     }
   }
@@ -128,10 +129,13 @@ class _SettingsPageState extends State<SettingsPage> {
     await _saveConfig();
     try {
       await _aiService.testConnection();
+      if (!mounted) return;
       _safeToast(context.l10n.settingsToastTestSuccess);
     } on LLMException catch (e) {
+      if (!mounted) return;
       _safeToast(LlmErrorLocalizer.localizeLLMException(context, e));
     } catch (_) {
+      if (!mounted) return;
       _safeToast(context.l10n.settingsToastTestUnexpectedError);
     } finally {
       if (mounted) setState(() => _isTesting = false);

@@ -17,11 +17,7 @@ import 'package:worder/util/word_hero_source.dart';
 /// 可回忆概率 + 时间线)、note 列表(长按操作:编辑 / 置顶 / 删除)。
 @RoutePage()
 class WordDetailPage extends StatefulWidget {
-  const WordDetailPage({
-    super.key,
-    required this.word,
-    required this.source,
-  });
+  const WordDetailPage({super.key, required this.word, required this.source});
 
   final WordModel word;
 
@@ -514,11 +510,7 @@ class _MemoryStatsPlaceholder extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.lock_outline,
-            size: 18,
-            color: colors.onSurfaceVariant,
-          ),
+          Icon(Icons.lock_outline, size: 18, color: colors.onSurfaceVariant),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
