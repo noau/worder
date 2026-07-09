@@ -168,6 +168,32 @@
   "@addWordToastSaveError": {
     "description": "Toast message shown when persisting a new word fails. The form is left intact for retry."
   },
+  "addWordDuplicateWarning": "此單詞已存在於詞庫中",
+  "@addWordDuplicateWarning": {
+    "description": "Helper text shown under the Word TextField on the Add Word page when the typed word already exists in the database. Soft warning only — duplicates are allowed (per CLAUDE.md identifier strategy: same word can appear multiple times with different notes/contexts)."
+  },
+  "addWordDuplicateDialogTitle": "重複單詞",
+  "@addWordDuplicateDialogTitle": {
+    "description": "Title of the dialog shown when the user clicks AI Enhance or Confirm on the Add Word page with a word that already exists in the database. Soft warning; the user can proceed by tapping Add anyway."
+  },
+  "addWordDuplicateDialogMessage": "「{word}」已存在於詞庫中，是否仍要繼續新增？",
+  "@addWordDuplicateDialogMessage": {
+    "description": "Body of the duplicate-word dialog on the Add Word page. Includes the offending word in double quotes so the user can verify they typed it correctly. Falls back to English in non-en locales until translated.",
+    "placeholders": {
+      "word": {
+        "type": "String",
+        "example": "serendipity"
+      }
+    }
+  },
+  "addWordDuplicateDialogOk": "仍然新增",
+  "@addWordDuplicateDialogOk": {
+    "description": "OK button label of the duplicate-word dialog on the Add Word page. Proceeds with the existing flow (AI Enhance sheet open or save confirmation dialog)."
+  },
+  "addWordDuplicateDialogCancel": "取消",
+  "@addWordDuplicateDialogCancel": {
+    "description": "Cancel button label of the duplicate-word dialog on the Add Word page. Aborts the action."
+  },
   "addWordEnhanceLoading": "AI 正在增強單詞資訊…",
   "@addWordEnhanceLoading": {
     "description": "Loading text shown inside the AI Enhance sheet while waiting for the LLM to return pinyin/meaning/notes."
@@ -552,35 +578,35 @@
       }
     }
   },
-  "settingsSectionBackup": "Backup & Restore",
+  "settingsSectionBackup": "備份與復原",
   "@settingsSectionBackup": {
     "description": "Section heading on the settings page that groups the export and import buttons."
   },
-  "settingsBackupDescription": "Save a complete copy of your library and settings, or restore from one.",
+  "settingsBackupDescription": "儲存詞庫與設定的完整副本，或從備份復原。",
   "@settingsBackupDescription": {
     "description": "Subtitle below the Backup & Restore section heading, summarising what the buttons do."
   },
-  "settingsBackupExportButton": "Export backup",
+  "settingsBackupExportButton": "匯出備份",
   "@settingsBackupExportButton": {
     "description": "Tonal button label that opens a system save dialog and writes a .zip of the current state."
   },
-  "settingsBackupImportButton": "Import backup",
+  "settingsBackupImportButton": "匯入備份",
   "@settingsBackupImportButton": {
     "description": "Tonal button label that opens a file picker for a .zip and overwrites the current state after confirmation."
   },
-  "settingsBackupExportDialogTitle": "Save backup as…",
+  "settingsBackupExportDialogTitle": "儲存備份為…",
   "@settingsBackupExportDialogTitle": {
     "description": "Title of the system save dialog opened by the Export button (file_picker.saveFile dialogTitle)."
   },
-  "settingsBackupExportSuccess": "Backup saved",
+  "settingsBackupExportSuccess": "備份已儲存",
   "@settingsBackupExportSuccess": {
     "description": "Toast shown after a successful export."
   },
-  "settingsBackupImportSuccess": "Restore complete. Restart to see changes.",
+  "settingsBackupImportSuccess": "復原完成，請重新啟動後再查看變更。",
   "@settingsBackupImportSuccess": {
     "description": "Toast shown after a successful restore. Warns the user that streams may be stale until restart."
   },
-  "settingsBackupErrorGeneric": "Backup failed: {message}",
+  "settingsBackupErrorGeneric": "備份失敗：{message}",
   "@settingsBackupErrorGeneric": {
     "description": "Catch-all toast for any BackupException not covered by a specific key. Carries the raw message so the user has something to report.",
     "placeholders": {
@@ -590,27 +616,27 @@
       }
     }
   },
-  "settingsBackupImportConfirmTitle": "Replace all data?",
+  "settingsBackupImportConfirmTitle": "覆蓋全部資料？",
   "@settingsBackupImportConfirmTitle": {
     "description": "Title of the destructive confirmation dialog before a restore."
   },
-  "settingsBackupImportConfirmMessage": "Your current library and settings will be replaced with the contents of the backup. A safety backup of the current state will be saved automatically. This cannot be undone after restart.",
+  "settingsBackupImportConfirmMessage": "目前的詞庫與設定將被備份中的內容取代，並會自動儲存一份目前資料作為安全備份。重新啟動後將無法復原。",
   "@settingsBackupImportConfirmMessage": {
     "description": "Body of the restore confirmation dialog. Explains that the action is destructive AND that a safety backup is created first."
   },
-  "settingsBackupImportConfirmOk": "Restore",
+  "settingsBackupImportConfirmOk": "復原",
   "@settingsBackupImportConfirmOk": {
     "description": "OK button label of the restore confirmation dialog. Destructive action."
   },
-  "settingsBackupImportConfirmCancel": "Cancel",
+  "settingsBackupImportConfirmCancel": "取消",
   "@settingsBackupImportConfirmCancel": {
     "description": "Cancel button label of the restore confirmation dialog."
   },
-  "settingsBackupRestartTitle": "Restart recommended",
+  "settingsBackupRestartTitle": "建議重新啟動",
   "@settingsBackupRestartTitle": {
     "description": "Title of the post-restore dialog asking the user to restart the app so the restored data is fully reflected."
   },
-  "settingsBackupRestartMessage": "The restore wrote to disk, but visible lists may be stale until restart. A safety backup of the previous state was saved as {path}.",
+  "settingsBackupRestartMessage": "資料已寫入磁碟，但畫面顯示可能要重新啟動後才會更新。復原前的資料已儲存為 {path}。",
   "@settingsBackupRestartMessage": {
     "description": "Body of the post-restore dialog. Includes the path of the pre-restore safety backup so the user can find it if needed.",
     "placeholders": {
@@ -620,27 +646,27 @@
       }
     }
   },
-  "settingsBackupRestartOk": "Restart now",
+  "settingsBackupRestartOk": "立即重新啟動",
   "@settingsBackupRestartOk": {
     "description": "OK button label of the post-restore dialog. Closes the app on Android via SystemNavigator.pop()."
   },
-  "settingsBackupRestartCancel": "Later",
+  "settingsBackupRestartCancel": "稍後",
   "@settingsBackupRestartCancel": {
     "description": "Cancel button label of the post-restore dialog. User keeps using the app with potentially stale views."
   },
-  "settingsBackupErrorIo": "Could not read or write the backup file.",
+  "settingsBackupErrorIo": "無法讀取或寫入備份檔案。",
   "@settingsBackupErrorIo": {
     "description": "Toast shown for BackupException.kind.ioError (file read/write failures outside of zip corruption)."
   },
-  "settingsBackupErrorZipCorrupted": "The backup file is corrupted or not a valid zip.",
+  "settingsBackupErrorZipCorrupted": "備份檔案已損壞或不是有效的 zip 檔案。",
   "@settingsBackupErrorZipCorrupted": {
     "description": "Toast shown for BackupException.kind.zipCorrupted when ZipDecoder.decodeBytes throws."
   },
-  "settingsBackupErrorManifestMissing": "The backup is missing its manifest.json.",
+  "settingsBackupErrorManifestMissing": "備份缺少 manifest.json。",
   "@settingsBackupErrorManifestMissing": {
     "description": "Toast shown for BackupException.kind.manifestMissing."
   },
-  "settingsBackupErrorUnsupportedVersion": "Backup schema version {version} is not supported by this app.",
+  "settingsBackupErrorUnsupportedVersion": "備份格式版本 {version} 不受本應用程式支援。",
   "@settingsBackupErrorUnsupportedVersion": {
     "description": "Toast shown for BackupException.kind.manifestUnsupportedVersion. Includes the version found.",
     "placeholders": {
@@ -650,15 +676,15 @@
       }
     }
   },
-  "settingsBackupErrorDatabaseCorrupted": "The database file inside the backup is corrupted.",
+  "settingsBackupErrorDatabaseCorrupted": "備份內的資料庫檔案已損壞。",
   "@settingsBackupErrorDatabaseCorrupted": {
     "description": "Toast shown for BackupException.kind.databaseCorrupted when the SQLite magic header is missing."
   },
-  "settingsBackupErrorPreRestoreFailed": "Safety backup failed; restore aborted to protect your data.",
+  "settingsBackupErrorPreRestoreFailed": "安全備份失敗，已中止復原以保護你的資料。",
   "@settingsBackupErrorPreRestoreFailed": {
     "description": "Toast shown for BackupException.kind.preRestoreFailed. Reassures the user the live data was NOT touched."
   },
-  "settingsBackupErrorRestoreFailed": "Restore failed partway. The previous data is in the safety backup.",
+  "settingsBackupErrorRestoreFailed": "復原過程中發生錯誤，先前的資料可在安全備份中找到。",
   "@settingsBackupErrorRestoreFailed": {
     "description": "Toast shown for BackupException.kind.restoreFailed after the live DB write succeeded but a follow-up step failed."
   }
